@@ -1,14 +1,17 @@
 import { Router } from 'express'
 import { getMongoClient } from '../mongo'
 import { authMiddleware } from '../utils/auth'
+import { saveDevData } from '../dev-storage'
 
 const router = Router()
 
 router.post('/add', authMiddleware, async (req: any, res: any) => {
-  const { itemId, price } = req.body
-  if (!itemId) return res.status(400).json({ error: 'itemId required' })
+  const { itemId, id, price } = req.body
+  const normalizedId = itemId || id
+  if (!normalizedId) return res.status(400).json({ error: 'itemId required' })
   const db = getMongoClient().db()
-  await db.collection('carts').updateOne({ userId: req.user.sub }, { $push: { items: { itemId, price } } }, { upsert: true })
+  await db.collection('carts').updateOne({ userId: req.user.sub }, { $push: { items: { itemId: normalizedId, price: typeof price === 'number' ? price : 0 } } }, { upsert: true })
+  saveDevData()
   res.json({ ok: true })
 })
 

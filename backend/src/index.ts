@@ -4,12 +4,15 @@ import { connectNeo4j } from './neo4j';
 import app from './app'
 import { createServer } from 'http'
 import { startWSServer } from './ws-server'
+import { loadDevData } from './dev-storage'
 
 dotenv.config();
 
 const port = process.env.PORT || 4000;
 
 async function start() {
+  // try to load dev data for memory fallback
+  loadDevData()
   try {
     await connectMongo();
   } catch (err) {

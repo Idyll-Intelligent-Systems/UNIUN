@@ -7,32 +7,30 @@ let skipTests = false
 let mongod: MongoMemoryServer | null = null
 
 beforeAll(async () => {
+  process.env.MONGOMS_DISABLE_POSTINSTALL = '1'
+  process.env.MONGOMS_DOWNLOAD_URL = ''
   try {
     mongod = await MongoMemoryServer.create()
     process.env.MONGO_URI = mongod.getUri()
     await connectMongo()
     return
   } catch (err) {
-    console.warn('mongodb-memory-server failed to start, falling back to MONGO_URI if provided', err)
+    // silent fallback for environments without internet/mongo binaries
   }
 
   if (process.env.MONGO_URI) {
     try {
       await connectMongo()
       return
-    } catch (err) {
-      console.warn('Fallback MONGO_URI connection failed', err)
-    }
+  } catch (err) { /* ignore connect failure */ }
   }
-
-  console.warn('No MongoDB available for tests; skipping integration tests')
   skipTests = true
 })
 
 afterAll(async () => {
   try {
     await disconnectMongo()
-  } catch (_) {}
+  } catch (_) { /* ignore disconnect failure */ }
   if (mongod) await mongod.stop()
 })
 

@@ -1,4 +1,3 @@
-import Layout from '../components/Layout'
 import { Card } from '../components/ui/Card'
 import { useEffect, useRef, useState } from 'react'
 
@@ -167,8 +166,7 @@ export default function Uniun() {
   }
 
   return (
-    <Layout>
-      <Card className="p-4">
+    <Card className="p-4">
         <h2 className="text-xl font-semibold mb-4">UNIUN - Creator Space</h2>
         <p className="text-sm text-gray-400">1:1 WebRTC demo using /ws signaling. This is a lightweight proof-of-concept — NAT traversal depends on STUN/TURN in real deployments.</p>
 
@@ -206,6 +204,5 @@ export default function Uniun() {
           <button onClick={send} className="px-3 py-2 bg-gold rounded">Send</button>
         </div>
       </Card>
-    </Layout>
   )
 }

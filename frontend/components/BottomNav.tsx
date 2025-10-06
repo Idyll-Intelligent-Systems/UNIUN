@@ -15,7 +15,7 @@ export default function BottomNav() {
       <Link href="/upload">
         <Button><Icons.PlusCircle size={16} /></Button>
       </Link>
-      <Link href="/messages">
+      <Link href="/messages-home">
         <Button><Icons.MessageSquare size={16} /></Button>
       </Link>
       <Link href="/profile">

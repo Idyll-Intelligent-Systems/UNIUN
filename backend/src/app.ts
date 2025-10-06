@@ -8,11 +8,17 @@ import paymentsRoutes from './routes/payments'
 import interactionsRoutes from './routes/interactions'
 import cartRoutes from './routes/cart'
 import turnRoutes from './routes/turn'
+import devRoutes from './routes/dev'
+import profileRoutes from './routes/profile'
+import searchRoutes from './routes/search'
 import 'express-async-errors'
+import path from 'path'
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')))
+app.use('/avatars', express.static(path.join(__dirname, '..', 'avatars')))
 
 setupMetrics();
 
@@ -32,8 +38,13 @@ app.use('/api/payments', paymentsRoutes)
 app.use('/api/interactions', interactionsRoutes)
 app.use('/api/cart', cartRoutes)
 app.use('/api/turn', turnRoutes)
+app.use('/api/profile', profileRoutes)
+app.use('/api/search', searchRoutes)
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/api/dev', devRoutes)
+}
 
-app.use((err: any, req: any, res: any, next: any) => {
+app.use((err: any, req: any, res: any) => {
   console.error(err)
   res.status(500).json({ error: 'internal' })
 })

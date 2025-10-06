@@ -84,6 +84,22 @@ Easy Content Monetization App for Creators, SAAS
         Notes & next steps:
         - The scaffold provides a minimal, enterprise-friendly structure and health endpoints. It does not implement full product features (shadcn UI components, authentication, payments, media storage). Those are next steps.
         - See `docker-compose.yml` for service ports and credentials.
+
+## Development quickstart
+
+- Backend
+    - Install deps: from `backend/` run `npm ci`
+    - Build: `npm run build`
+    - Run: `node dist/index.js` (works in degraded mode without Mongo/Neo4j)
+    - Tests: `npm test` (integration tests auto-skip when MongoDB is unavailable)
+
+- Frontend
+    - Install deps: from `frontend/` run `npm ci`
+    - Dev: `npm run dev`
+    - Build: `npm run build`
+    - Tests: `npm test` (Playwright e2e are excluded from Jest; run with `npm run e2e`)
+
+Environment variables: see `backend/src/types.d.ts` for supported keys.
 ## Containerization & Deployment
     A `Dockerfile` is provided for both `frontend` and `backend`. Use the included `docker-compose.yml` for local orchestration. For production, adapt Dockerfiles to your cloud provider's build pipeline and replace development settings (for example, use a managed vector DB and managed Neo4j or cloud-hosted databases).
 ## Testing
@@ -100,16 +116,64 @@ Write end to end enterprise grade, clean, reusable, expandable, fully scalable c
 
 - Playwright E2E tests are scaffolded under `frontend/e2e`. To run them locally:
 
-```bash
+<!-- markdownlint-disable MD046 -->
+```sh
 # from repo root
-pnpm install
+npm install --workspaces=false
 cd frontend
-pnpm -s e2e:install   # installs Playwright browsers
-pnpm -s e2e           # runs the tests against localhost:3000
+npm run e2e:install   # installs Playwright browsers
+npm run e2e           # runs the tests against localhost:3000
 ```
+<!-- markdownlint-enable MD046 -->
 
 - The WebRTC demo (`/uniun`) supports configuring STUN/TURN servers via env vars:
     - `NEXT_PUBLIC_STUN` (defaults to `stun:stun.l.google.com:19302`)
     - `NEXT_PUBLIC_TURN` (optional, e.g. `turn:turn.example.com:3478`)
 
 When running in CI, the GitHub Actions workflow `./github/workflows/e2e.yml` will start the Docker Compose stack and run Playwright tests.
+
+## Linting
+
+ESLint is configured for both frontend and backend.
+
+Run lint:
+
+```bash
+cd frontend && npm run lint
+# in another terminal
+cd backend && npm run lint
+```
+
+## Milvus on Apple Silicon (arm64)
+
+Milvus image used in docker-compose may not have an arm64 build. If you encounter platform errors on M1/M2:
+
+- Option A: enable emulation by uncommenting `platform: linux/amd64` under the `milvus` service in `docker-compose.yml`.
+- Option B: comment out the `milvus` service for local development if it's not required.
+
+## Security audit note
+
+The frontend may report one or more npm audit issues. Prefer upgrading the affected packages rather than using `--force`. Create an issue if you want us to propose a safe upgrade path.
+
+## One-command background dev
+
+From the repo root you can start both services in the background and check status/stop them:
+
+```bash
+# Start both in background (backend:4002, frontend:3002)
+npm run dev:bg
+
+# Check status and expected URLs
+npm run dev:status
+
+# Stop both
+npm run dev:down
+```
+
+Environment knobs:
+
+- BACKEND_PORT: default 4002
+- FRONTEND_PORT: default 3002
+- NEXT_PUBLIC_API_URL: defaults to <http://localhost:${BACKEND_PORT}>
+
+Logs are written under .logs/backend.log and .logs/frontend.log.

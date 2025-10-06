@@ -1,4 +1,3 @@
-import Layout from '../components/Layout'
 import { Card } from '../components/ui/Card'
 import { useEffect, useRef, useState } from 'react'
 
@@ -34,19 +33,17 @@ export default function MessagesV2() {
   }
 
   return (
-    <Layout>
-      <Card className="p-4">
-        <h2 className="text-xl font-semibold mb-4">Messages (v2)</h2>
-        <div className="mb-3">
-          <div className="h-48 overflow-auto bg-black/20 p-2 rounded">
-            {messages.map((m, i) => <div key={i} className="text-sm text-gray-200">{m}</div>)}
-          </div>
+    <Card className="p-4">
+      <h2 className="text-xl font-semibold mb-4">Messages (v2)</h2>
+      <div className="mb-3">
+        <div className="h-48 overflow-auto bg-black/20 p-2 rounded">
+          {messages.map((m, i) => <div key={i} className="text-sm text-gray-200">{m}</div>)}
         </div>
-        <div className="flex gap-2">
-          <input value={text} onChange={e => setText(e.target.value)} className="flex-1 p-2 bg-gray-800 rounded" placeholder="Type a message" />
-          <button onClick={send} className="px-3 py-2 bg-gold rounded">Send</button>
-        </div>
-      </Card>
-    </Layout>
+      </div>
+      <div className="flex gap-2">
+        <input value={text} onChange={e => setText(e.target.value)} className="flex-1 p-2 bg-gray-800 rounded" placeholder="Type a message" />
+        <button onClick={send} className="px-3 py-2 bg-gold rounded">Send</button>
+      </div>
+    </Card>
   )
 }

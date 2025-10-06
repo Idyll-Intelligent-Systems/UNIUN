@@ -13,6 +13,11 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@types/eslint": "^8.56.12",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0",
     "@playwright/test": "^1.40.0",
     "playwright": "^1.40.0",
     "@testing-library/jest-dom": "^6.0.0",
@@ -30,6 +35,7 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
+  "lint": "eslint . --ext .ts,.tsx",
   "test": "jest --config jest.config.cjs --passWithNoTests",
   "e2e:install": "npx playwright install --with-deps",
   "e2e": "playwright test --project=chromium"

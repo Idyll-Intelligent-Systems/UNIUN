@@ -1,0 +1,185 @@
+{
+  "users": [
+    {
+      "_id": "78133b114583703554fecea8",
+      "username": "veee",
+      "password": "$2a$10$ygARunt0N/9hZrz9CJsv8.PD/WMLFi1g544bm8b8epxMOpX3SyQGa",
+      "createdAt": "2025-10-05T18:04:21.867Z"
+    }
+  ],
+  "posts": [
+    {
+      "_id": "f196682c6409d20cdabc673d",
+      "title": "PrDeep upload 1",
+      "mediaType": "image",
+      "mediaUrl": "/uploads/images/1759691100503-90bea7e88d.jpeg",
+      "ownerId": "78133b114583703554fecea8",
+      "likes": 1,
+      "replies": 0,
+      "reposts": 0,
+      "views": 0,
+      "createdAt": "2025-10-05T19:05:00.507Z"
+    },
+    {
+      "_id": "480699a76fd1aeab84d14139",
+      "title": "New",
+      "mediaType": "image",
+      "mediaUrl": "/uploads/images/1759690279647-5a98bd972d.jpeg",
+      "ownerId": "78133b114583703554fecea8",
+      "likes": 2,
+      "replies": 0,
+      "reposts": 1,
+      "views": 0,
+      "createdAt": "2025-10-05T18:51:19.666Z"
+    },
+    {
+      "_id": "5df4c9e39364a3b78840c986",
+      "title": "Newoje",
+      "mediaType": "image",
+      "mediaUrl": "/uploads/images/1759689403874-e5c047af62.jpeg",
+      "ownerId": "78133b114583703554fecea8",
+      "likes": 0,
+      "replies": 0,
+      "reposts": 0,
+      "views": 0,
+      "createdAt": "2025-10-05T18:36:43.893Z"
+    },
+    {
+      "_id": "d0fc90d352fd518cf91fe315",
+      "title": "4th upload",
+      "mediaType": "image",
+      "mediaUrl": "/uploads/images/1759689109102-06efaa04ce.jpeg",
+      "ownerId": "78133b114583703554fecea8",
+      "likes": 1,
+      "replies": 0,
+      "reposts": 1,
+      "views": 0,
+      "createdAt": "2025-10-05T18:31:49.120Z"
+    },
+    {
+      "_id": "442b8cdc27484c081ce59df1",
+      "title": "3n",
+      "mediaType": "image",
+      "ownerId": "78133b114583703554fecea8",
+      "likes": 0,
+      "replies": 0,
+      "reposts": 0,
+      "views": 0,
+      "createdAt": "2025-10-05T18:07:39.491Z"
+    },
+    {
+      "_id": "97996f6c2df7f51404e410be",
+      "title": "2nd upload",
+      "mediaType": "image",
+      "ownerId": "78133b114583703554fecea8",
+      "likes": 1,
+      "replies": 0,
+      "reposts": 1,
+      "views": 0,
+      "createdAt": "2025-10-05T18:06:42.128Z"
+    },
+    {
+      "_id": "44cdaaa0b05a18e70fcf13fb",
+      "title": "First upload",
+      "mediaType": "image",
+      "ownerId": "78133b114583703554fecea8",
+      "likes": 1,
+      "replies": 0,
+      "reposts": 1,
+      "views": 0,
+      "createdAt": "2025-10-05T18:04:37.942Z"
+    },
+    {
+      "_id": "8dfedeacdee449646e03db4d",
+      "title": "First upload",
+      "mediaType": "image",
+      "ownerId": "78133b114583703554fecea8",
+      "likes": 1,
+      "replies": 0,
+      "reposts": 1,
+      "views": 0,
+      "createdAt": "2025-10-05T18:04:36.737Z"
+    }
+  ],
+  "bookmarks": [
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "44cdaaa0b05a18e70fcf13fb",
+      "createdAt": "2025-10-05T18:04:56.828Z"
+    },
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "s1",
+      "createdAt": "2025-10-05T18:06:09.796Z"
+    },
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "d0fc90d352fd518cf91fe315",
+      "createdAt": "2025-10-05T18:32:17.972Z"
+    },
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "480699a76fd1aeab84d14139",
+      "createdAt": "2025-10-05T18:58:13.945Z"
+    }
+  ],
+  "reposts": [
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "d0fc90d352fd518cf91fe315",
+      "createdAt": "2025-10-05T18:32:21.435Z"
+    },
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "480699a76fd1aeab84d14139",
+      "createdAt": "2025-10-05T18:58:08.306Z"
+    }
+  ],
+  "replies": [
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "d0fc90d352fd518cf91fe315",
+      "text": "hi",
+      "createdAt": "2025-10-05T18:32:10.224Z"
+    },
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "480699a76fd1aeab84d14139",
+      "text": "akjbds",
+      "createdAt": "2025-10-05T18:58:02.481Z"
+    },
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "f196682c6409d20cdabc673d",
+      "text": "nice ",
+      "createdAt": "2025-10-05T19:06:47.601Z"
+    }
+  ],
+  "carts": {
+    "78133b114583703554fecea8": {
+      "userId": "78133b114583703554fecea8",
+      "items": [
+        {
+          "itemId": "44cdaaa0b05a18e70fcf13fb",
+          "price": 0
+        },
+        {
+          "itemId": "s1",
+          "price": 0
+        },
+        {
+          "itemId": "s1",
+          "price": 0
+        },
+        {
+          "itemId": "d0fc90d352fd518cf91fe315",
+          "price": 0
+        },
+        {
+          "itemId": "480699a76fd1aeab84d14139",
+          "price": 0
+        }
+      ]
+    }
+  }
+}

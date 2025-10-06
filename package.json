@@ -1,0 +1,15 @@
+{
+  "name": "uniun-root",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k -n backend,frontend -c blue,green \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "bash -lc 'cd backend && PORT=${BACKEND_PORT:-4002} npm run dev'",
+    "dev:frontend": "bash -lc 'cd frontend && NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:4002} npx next dev -p ${FRONTEND_PORT:-3002}'",
+    "dev:bg": "bash scripts/dev-bg.sh",
+    "dev:down": "bash scripts/dev-down.sh",
+    "dev:status": "bash scripts/dev-status.sh"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

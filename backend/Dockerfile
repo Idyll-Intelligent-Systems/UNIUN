@@ -1,7 +1,8 @@
 FROM node:20-slim
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev || npm install
+# Copy only package.json to avoid stale lockfile bringing native bcrypt
+COPY package.json ./
+RUN npm install --omit=dev
 COPY . .
 RUN npm run build
 EXPOSE 4000

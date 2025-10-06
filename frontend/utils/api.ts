@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:4000'
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
 
 export async function api(path: string, opts: RequestInit = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
@@ -42,6 +42,9 @@ export async function repostPost(postId: string) {
 export async function bookmarkPost(postId: string) {
   return api(`/api/interactions/${postId}/bookmark`, { method: 'POST' })
 }
+export async function replyPost(postId: string, text: string) {
+  return api(`/api/interactions/${postId}/reply`, { method: 'POST', body: JSON.stringify({ text }) })
+}
 
 // cart
 export async function addToCart(item: { id: string; title: string; price?: number }) {
@@ -56,4 +59,10 @@ export async function checkoutCart() {
   return api('/api/cart/checkout', { method: 'POST' })
 }
 
-export default { api, register, login, createPost, listPosts, likePost, repostPost, bookmarkPost, addToCart, getCart, checkoutCart }
+// profile data
+export async function listBookmarks() { return api('/api/profile/bookmarks') }
+export async function listReposts() { return api('/api/profile/reposts') }
+export async function listReplies() { return api('/api/profile/replies') }
+
+const exported = { api, register, login, createPost, listPosts, likePost, repostPost, bookmarkPost, replyPost, addToCart, getCart, checkoutCart, listBookmarks, listReposts, listReplies }
+export default exported

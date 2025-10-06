@@ -3,24 +3,15 @@ import Button from './ui/Button'
 import Icons from './ui/icons'
 import { useState } from 'react'
 import api from '../utils/api'
-
-type Content = {
-  id?: string
-  _id?: any
-  title?: string
-  mediaType?: 'image' | 'video' | 'audio'
-  mediaUrl?: string
-  likes?: number
-  replies?: number
-  reposts?: number
-  views?: number
-}
+import Image from 'next/image'
 
 export default function ContentCard({ item }: { item: any }) {
   const [likes, setLikes] = useState(item?.likes || 0)
   const [reposts, setReposts] = useState(item?.reposts || 0)
   const [bookmarked, setBookmarked] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [reply, setReply] = useState('')
+  const [replies, setReplies] = useState(item?.replies || 0)
 
   // normalize id value (Mongo returns _id sometimes)
   const safeId = item?.id || (item?._id ? (typeof item._id === 'string' ? item._id : item._id.toString()) : undefined)
@@ -99,29 +90,49 @@ export default function ContentCard({ item }: { item: any }) {
     }
   }
 
+  const media = (item?.mediaUrl && typeof item.mediaUrl === 'string') ? item.mediaUrl : null
   return (
     <Card className="w-full overflow-hidden" >
-      <div className="w-full h-64 bg-gradient-to-t from-black to-gray-900 flex items-center justify-center">
-        <span className="text-gray-500">{(item?.mediaType || 'image').toString().toUpperCase()} PLACEHOLDER</span>
+      <div className="relative w-full h-64 bg-gradient-to-t from-black to-gray-900 flex items-center justify-center overflow-hidden">
+        {media ? (
+          item?.mediaType === 'video' ? (
+            <video controls className="w-full h-full object-cover"><source src={media} /></video>
+          ) : item?.mediaType === 'audio' ? (
+            <audio controls className="w-full"><source src={media} /></audio>
+          ) : (
+            <Image src={media} alt={item?.title || 'media'} fill style={{ objectFit: 'cover' }} sizes="100vw" />
+          )
+        ) : (
+          <span className="text-gray-500">{(item?.mediaType || 'image').toString().toUpperCase()} PLACEHOLDER</span>
+        )}
       </div>
       <div className="p-4">
         <h3 className="text-white font-semibold">{item?.title}</h3>
         <div className="mt-3 flex items-center justify-between text-gray-300 text-sm">
           <div className="flex gap-4 items-center">
-            <button onClick={onLike} className="flex items-center gap-1">
+            <button data-testid="like-btn" onClick={onLike} className="flex items-center gap-1">
               <Icons.Heart size={16} />{likes}
             </button>
-            <div className="flex items-center gap-1"><Icons.Message size={16} />{item?.replies || 0}</div>
-            <button onClick={onRepost} className="flex items-center gap-1">
+            <div className="flex items-center gap-1"><Icons.Message size={16} />{replies}</div>
+            <button data-testid="repost-btn" onClick={onRepost} className="flex items-center gap-1">
               <Icons.Repeat size={16} />{reposts}
             </button>
             <div className="flex items-center gap-1"><Icons.Eye size={16} />{item?.views || 0}</div>
           </div>
           <div className="flex gap-3">
             <Button onClick={onAddToCart} disabled={loading} className="text-gold">{loading ? 'Adding...' : 'Add to cart'}</Button>
-            <Button onClick={onBookmark} className={`text-gray-300 ${bookmarked ? 'opacity-70' : ''}`}>{bookmarked ? 'Bookmarked' : 'Wishlist'}</Button>
+            <Button data-testid="bookmark-btn" onClick={onBookmark} className={`text-gray-300 ${bookmarked ? 'opacity-70' : ''}`}>{bookmarked ? 'Bookmarked' : 'Wishlist'}</Button>
           </div>
         </div>
+      </div>
+      <div className="p-4 border-t border-gray-800 flex gap-2">
+        <input value={reply} onChange={e=>setReply(e.target.value)} className="flex-1 p-2 bg-gray-800 rounded" placeholder="Reply…" />
+        <Button onClick={async ()=>{
+          if (!safeId || !reply.trim()) return
+          const text = reply
+          setReply('')
+          try { await api.replyPost(safeId, text); setReplies((r: number)=>r+1) } catch(e){ console.error('reply failed', e) }
+        }}>Reply</Button>
       </div>
     </Card>
   )
