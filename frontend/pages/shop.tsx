@@ -18,7 +18,8 @@ export default function Shop() {
         likes: p.likes || 0,
         replies: p.replies || 0,
         reposts: p.reposts || 0,
-        views: p.views || 0
+        views: p.views || 0,
+        price: typeof p.price === 'number' ? p.price : undefined,
       }))
       setItems(mapped)
     }).catch(() => setItems([]))

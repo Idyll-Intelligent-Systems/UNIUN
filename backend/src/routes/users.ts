@@ -21,11 +21,128 @@ function getAvatarFor(username?: string) {
   return `/avatars/${username.toLowerCase()}.png`
 }
 
+// User cards with counts: username, bio (if any), followers/following/posts counts
+router.get('/cards', async (req: any, res: any) => {
+  const sortParam = (req.query.sort || 'followers').toString()
+  const dirParam = (req.query.dir || 'desc').toString().toLowerCase()
+  const page = Math.max(1, parseInt((req.query.page || '1').toString(), 10) || 1)
+  const limit = Math.min(50, Math.max(1, parseInt((req.query.limit || '12').toString(), 10) || 12))
+  const sortKey = ['followers','following','posts','username'].includes(sortParam) ? sortParam : 'followers'
+  const sortDir = dirParam === 'asc' ? 'asc' : 'desc'
+  try {
+    const db = getMongoClient().db()
+    const users = await db.collection('users').find({}, { projection: { password: 0 } } as any).limit(100).toArray()
+    // If DB (or shim) returned nothing, fall back to memory users
+    if (!users || users.length === 0) {
+      const outMem = mem.users.slice(0, 100).map((u:any) => {
+        const followersCount = mem.followers.filter(f => f.followeeId === String(u._id)).length
+        const followingCount = mem.followers.filter(f => f.followerId === String(u._id)).length
+        const postsCount = mem.posts.filter(p => String(p.ownerId) === String(u._id)).length
+        return {
+          id: u._id,
+          username: u.username,
+          avatarUrl: getAvatarFor(u.username),
+          bio: (u as any).bio || null,
+          followersCount,
+          followingCount,
+          postsCount,
+        }
+      })
+      // Sort
+      outMem.sort((a:any,b:any) => {
+        if (sortKey === 'username') {
+          const cmp = String(a.username || '').localeCompare(String(b.username || ''), undefined, { sensitivity: 'base' })
+          return sortDir === 'asc' ? cmp : -cmp
+        }
+        const ka = sortKey==='followers'?a.followersCount: sortKey==='following'?a.followingCount: a.postsCount
+        const kb = sortKey==='followers'?b.followersCount: sortKey==='following'?b.followingCount: b.postsCount
+        const cmp = Number(ka) - Number(kb)
+        return sortDir === 'asc' ? cmp : -cmp
+      })
+      const total = outMem.length
+      const start = (page - 1) * limit
+      const items = outMem.slice(start, start + limit)
+      return res.json({ items, total })
+    }
+    const out = [] as any[]
+    for (const u of users) {
+      let followersCount = 0, followingCount = 0, postsCount = 0
+      try {
+        followersCount = await db.collection('follows').countDocuments({ followeeId: (u as any)._id })
+      } catch {}
+      try {
+        followingCount = await db.collection('follows').countDocuments({ followerId: (u as any)._id })
+      } catch {}
+      try {
+        postsCount = await db.collection('posts').countDocuments({ ownerId: (u as any)._id })
+      } catch {}
+      out.push({
+        id: (u as any)._id,
+        username: (u as any).username,
+        avatarUrl: getAvatarFor((u as any).username),
+        bio: (u as any).bio || null,
+        followersCount,
+        followingCount,
+        postsCount,
+      })
+    }
+    // Sort
+    out.sort((a:any,b:any) => {
+      if (sortKey === 'username') {
+        const cmp = String(a.username || '').localeCompare(String(b.username || ''), undefined, { sensitivity: 'base' })
+        return sortDir === 'asc' ? cmp : -cmp
+      }
+      const ka = sortKey==='followers'?a.followersCount: sortKey==='following'?a.followingCount: a.postsCount
+      const kb = sortKey==='followers'?b.followersCount: sortKey==='following'?b.followingCount: b.postsCount
+      const cmp = Number(ka) - Number(kb)
+      return sortDir === 'asc' ? cmp : -cmp
+    })
+    const total = out.length
+    const start = (page - 1) * limit
+    const items = out.slice(start, start + limit)
+    return res.json({ items, total })
+  } catch (e) {
+    // fallback to memory
+    const out = mem.users.slice(0, 100).map((u:any) => {
+      const followersCount = mem.followers.filter(f => f.followeeId === String(u._id)).length
+      const followingCount = mem.followers.filter(f => f.followerId === String(u._id)).length
+      const postsCount = mem.posts.filter(p => String(p.ownerId) === String(u._id)).length
+      return {
+        id: u._id,
+        username: u.username,
+        avatarUrl: getAvatarFor(u.username),
+        bio: (u as any).bio || null,
+        followersCount,
+        followingCount,
+        postsCount,
+      }
+    })
+    out.sort((a:any,b:any) => {
+      if (sortKey === 'username') {
+        const cmp = String(a.username || '').localeCompare(String(b.username || ''), undefined, { sensitivity: 'base' })
+        return sortDir === 'asc' ? cmp : -cmp
+      }
+      const ka = sortKey==='followers'?a.followersCount: sortKey==='following'?a.followingCount: a.postsCount
+      const kb = sortKey==='followers'?b.followersCount: sortKey==='following'?b.followingCount: b.postsCount
+      const cmp = Number(ka) - Number(kb)
+      return sortDir === 'asc' ? cmp : -cmp
+    })
+    const total = out.length
+    const start = (page - 1) * limit
+    const items = out.slice(start, start + limit)
+    return res.json({ items, total })
+  }
+})
+
 // List users (basic)
 router.get('/', async (req: any, res: any) => {
   try {
     const db = getMongoClient().db()
     const docs = await db.collection('users').find({}, { projection: { password: 0 } } as any).limit(50).toArray()
+    if (!docs || docs.length === 0) {
+      // shim likely returned empty; use memory fallback
+      return res.json(mem.users.map(u => ({ id: u._id, _id: u._id, username: u.username, createdAt: u.createdAt, avatarUrl: getAvatarFor(u.username) })))
+    }
     return res.json(docs.map((u:any)=> ({ id: u._id, _id: u._id, username: u.username, avatarUrl: getAvatarFor(u.username) })))
   } catch (e) {
     // fallback to memory (exclude password)
@@ -59,12 +176,12 @@ router.get('/me', authMiddleware, async (req: any, res: any) => {
   const userId = req.user.sub
   // try to get from mem first
   const m = mem.users.find(u => String(u._id) === String(userId))
-  if (m) return res.json({ id: m._id, username: m.username })
+  if (m) return res.json({ id: m._id, username: m.username, avatarUrl: getAvatarFor(m.username) })
   // try DB
   try {
     const db = getMongoClient().db()
     const user = await db.collection('users').findOne({ _id: (userId as any) })
-    if (user) return res.json({ id: user._id, username: (user as any).username })
+    if (user) return res.json({ id: user._id, username: (user as any).username, avatarUrl: getAvatarFor((user as any).username) })
   } catch (e) {
     // ignore
   }

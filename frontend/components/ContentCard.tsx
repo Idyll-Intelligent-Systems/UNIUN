@@ -83,7 +83,8 @@ export default function ContentCard({ item }: { item: any }) {
     setLoading(true)
     try {
       // api expects { id, title }
-      await api.addToCart({ id: safeId, title: item?.title, price: 0 })
+      const p = typeof item?.price === 'number' && isFinite(item.price) ? item.price : undefined
+      await api.addToCart({ id: safeId, title: item?.title, price: p })
     } catch (e) {
       console.error('add to cart failed', e)
     } finally {
@@ -127,7 +128,9 @@ export default function ContentCard({ item }: { item: any }) {
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-white font-semibold truncate">{item?.title}</h3>
           {(me && (me.id === item?.ownerId || me._id === item?.ownerId)) && (
-            <button onClick={onDelete} className="text-red-400 text-sm hover:text-red-300">Delete</button>
+            <button onClick={onDelete} aria-label="Delete post" title="Delete post" className="text-red-400 hover:text-red-300 p-1 rounded">
+              <Icons.Trash size={18} />
+            </button>
           )}
         </div>
         <div className="mt-3 flex items-center justify-between text-gray-300 text-sm">
@@ -141,7 +144,8 @@ export default function ContentCard({ item }: { item: any }) {
             </button>
             <div className="flex items-center gap-1"><Icons.Eye size={16} />{item?.views || 0}</div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
+            <span className="text-gold font-medium">{(typeof item?.price === 'number' && isFinite(item.price)) ? `Cost: $${item.price.toFixed(2)}` : 'Free'}</span>
             <Button onClick={onAddToCart} disabled={loading} className="text-gold">{loading ? 'Adding...' : 'Add to cart'}</Button>
             <Button data-testid="bookmark-btn" onClick={onBookmark} className={`text-gray-300 ${bookmarked ? 'opacity-70' : ''}`}>{bookmarked ? 'Bookmarked' : 'Wishlist'}</Button>
           </div>

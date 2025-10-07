@@ -68,3 +68,25 @@ router.post('/:withUserId', authMiddleware, (req: any, res: any) => {
 })
 
 export default router
+// Dev-only seed for canned messages between dummy users
+if (process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { mem } = require('../memory')
+  router.post('/seed', (req: any, res: any) => {
+    const users: any[] = mem?.users || []
+    const byName = (name: string) => users.find((u:any)=>u.username===name)?._id
+    const pairs: Array<[string,string]> = [
+      ['PAZE','Veee'], ['MSSM','PrDeep'], ['MITRA','SHAVAITE'], ['PAZE','PrDeep']
+    ]
+    const now = new Date()
+    for (const [a,b] of pairs) {
+      const ua = byName(a); const ub = byName(b)
+      if (!ua || !ub) continue
+      // a -> b
+      messages.push({ id: Math.random().toString(36).slice(2), from: String(ua), to: String(ub), text: `${a}: hey ${b}!`, createdAt: new Date(now.getTime()-600000) })
+      messages.push({ id: Math.random().toString(36).slice(2), from: String(ub), to: String(ua), text: `${b}: hi ${a}, welcome to UNIUN`, createdAt: new Date(now.getTime()-540000) })
+      messages.push({ id: Math.random().toString(36).slice(2), from: String(ua), to: String(ub), text: `${a}: let's ship`, createdAt: new Date(now.getTime()-480000) })
+    }
+    res.json({ ok: true, count: messages.length })
+  })
+}

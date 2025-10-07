@@ -22,8 +22,10 @@ export async function login(username: string, password: string) {
   return api('/api/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) })
 }
 
-export async function createPost(title: string, mediaType: string, mediaUrl?: string) {
-  return api('/api/posts', { method: 'POST', body: JSON.stringify({ title, mediaType, mediaUrl }) })
+export async function createPost(title: string, mediaType: string, mediaUrl?: string, price?: number) {
+  const body: any = { title, mediaType, mediaUrl }
+  if (typeof price === 'number' && isFinite(price)) body.price = price
+  return api('/api/posts', { method: 'POST', body: JSON.stringify(body) })
 }
 
 export async function listPosts() {

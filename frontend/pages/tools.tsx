@@ -15,6 +15,7 @@ export default function Tools() {
       <div className="flex flex-col gap-2">
         <Button onClick={async () => { setBusy(true); await api('/api/dev/clear'); setBusy(false); alert('Cleared dev data') }} disabled={busy}>Clear Dev Data</Button>
         <Button onClick={async () => { setBusy(true); await api('/api/dev/seed'); setBusy(false); alert('Seeded demo posts') }} disabled={busy}>Seed Demo Content</Button>
+        <Button onClick={async () => { setBusy(true); await api('/api/messages/seed'); setBusy(false); alert('Seeded canned messages') }} disabled={busy}>Seed Messages</Button>
         <a className="text-sm text-gray-400 hover:text-white" href="/">Back to Home</a>
       </div>
     </Card>

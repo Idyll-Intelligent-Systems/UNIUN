@@ -5,16 +5,35 @@
       "username": "veee",
       "password": "$2a$10$ygARunt0N/9hZrz9CJsv8.PD/WMLFi1g544bm8b8epxMOpX3SyQGa",
       "createdAt": "2025-10-05T18:04:21.867Z"
+    },
+    {
+      "_id": "d79a6d02d64f25d993129acf",
+      "username": "seee",
+      "password": "$2a$10$eJoe68u.f7xx3UbaGpkSVuYT7OKMvf9sB.d67uOBab5wNweB2kstm",
+      "createdAt": "2025-10-07T03:00:04.875Z"
     }
   ],
   "posts": [
+    {
+      "_id": "5411844d5d090b35407dc00d",
+      "title": "New Priced Content",
+      "mediaType": "image",
+      "mediaUrl": "/uploads/images/1759807479763-c6f5f12306.jpeg",
+      "ownerId": "78133b114583703554fecea8",
+      "likes": 0,
+      "replies": 0,
+      "reposts": 0,
+      "views": 0,
+      "createdAt": "2025-10-07T03:24:39.784Z",
+      "price": 9.99
+    },
     {
       "_id": "f196682c6409d20cdabc673d",
       "title": "PrDeep upload 1",
       "mediaType": "image",
       "mediaUrl": "/uploads/images/1759691100503-90bea7e88d.jpeg",
       "ownerId": "78133b114583703554fecea8",
-      "likes": 1,
+      "likes": 2,
       "replies": 0,
       "reposts": 0,
       "views": 0,
@@ -88,17 +107,6 @@
       "reposts": 1,
       "views": 0,
       "createdAt": "2025-10-05T18:04:37.942Z"
-    },
-    {
-      "_id": "8dfedeacdee449646e03db4d",
-      "title": "First upload",
-      "mediaType": "image",
-      "ownerId": "78133b114583703554fecea8",
-      "likes": 1,
-      "replies": 0,
-      "reposts": 1,
-      "views": 0,
-      "createdAt": "2025-10-05T18:04:36.737Z"
     }
   ],
   "bookmarks": [
@@ -153,6 +161,12 @@
       "postId": "f196682c6409d20cdabc673d",
       "text": "nice ",
       "createdAt": "2025-10-05T19:06:47.601Z"
+    },
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "f196682c6409d20cdabc673d",
+      "text": "hi",
+      "createdAt": "2025-10-07T02:30:45.591Z"
     }
   ],
   "carts": {
@@ -177,6 +191,15 @@
         },
         {
           "itemId": "480699a76fd1aeab84d14139",
+          "price": 0
+        }
+      ]
+    },
+    "d79a6d02d64f25d993129acf": {
+      "userId": "d79a6d02d64f25d993129acf",
+      "items": [
+        {
+          "itemId": "f196682c6409d20cdabc673d",
           "price": 0
         }
       ]

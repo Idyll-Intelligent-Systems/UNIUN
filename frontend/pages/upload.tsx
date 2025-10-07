@@ -1,12 +1,20 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPost } from '../utils/api'
 import Button from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
+import AuthModal from '../components/AuthModal'
 
 export default function Upload() {
   const [title, setTitle] = useState('')
   const [mediaType, setMediaType] = useState('image')
     const [file, setFile] = useState<File | null>(null)
+  const [authed, setAuthed] = useState(true)
+  const [price, setPrice] = useState<string>('')
+
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+    setAuthed(!!token)
+  }, [])
 
   async function submit() {
     try {
@@ -28,14 +36,18 @@ export default function Upload() {
           // ignore upload failure, proceed without mediaUrl
         }
       }
-        await createPost(title, mediaType, publicUrl)
+        const parsedPrice = price.trim() === '' ? undefined : Number(price)
+        await createPost(title, mediaType, publicUrl, (isFinite(parsedPrice as number) ? (parsedPrice as number) : undefined))
       setTitle('')
+      setPrice('')
       // Navigate home so user can see the post
       if (typeof window !== 'undefined') window.location.href = '/'
     } catch (err: any) {
       alert('Error: ' + err.message)
     }
   }
+
+  if (!authed) return <AuthModal />
 
   return (
     <Card className="p-4">
@@ -50,6 +62,9 @@ export default function Upload() {
       <label className="block text-sm mb-1" htmlFor="mediaFile">Media File (optional)</label>
       <input id="mediaFile" type="file" className="w-full mb-4 p-2 rounded bg-gray-900"
         onChange={(e) => setFile(e.target.files && e.target.files[0] ? e.target.files[0] : null)} />
+      <label className="block text-sm mb-1" htmlFor="price">Price (optional)</label>
+      <input id="price" type="number" min="0" step="0.01" className="w-full mb-4 p-2 rounded bg-gray-900" placeholder="e.g. 4.99"
+        value={price} onChange={(e) => setPrice(e.target.value)} />
       <div className="flex items-center justify-between">
         <a href="/" className="text-gray-400 hover:text-white">Back</a>
         <Button onClick={submit}>Upload</Button>

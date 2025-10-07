@@ -2,7 +2,7 @@
 // Not for production use. Data resets on server restart.
 
 export type MemUser = { _id: string; username: string; password: string; createdAt: Date }
-export type MemPost = { _id: string; title: string; mediaType: string; mediaUrl?: string; ownerId: string; likes: number; replies: number; reposts: number; views: number; createdAt: Date }
+export type MemPost = { _id: string; title: string; mediaType: string; mediaUrl?: string; ownerId: string; likes: number; replies: number; reposts: number; views: number; createdAt: Date; price?: number }
 export type MemCart = { userId: string; items: { itemId: string; price: number }[] }
 export type MemBookmark = { userId: string; postId: string; createdAt: Date }
 export type MemRepost = { userId: string; postId: string; createdAt: Date }

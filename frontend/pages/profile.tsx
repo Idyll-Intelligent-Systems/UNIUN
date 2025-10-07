@@ -5,7 +5,7 @@ import { listPosts, getCart, listBookmarks, listReposts, listReplies, me as getM
 import ContentCard from '../components/ContentCard'
 
 export default function Profile() {
-  const [tab, setTab] = useState<'posts'|'reposts'|'replies'|'cart'|'bookmarks'|'followers'|'following'>('posts')
+  const [tab, setTab] = useState<'posts'|'reposts'|'replies'|'cart'|'bookmarks'|'followers'|'following'|'account'>('posts')
   const [allPosts, setAllPosts] = useState<any[]>([])
   const [cart, setCart] = useState<{ items: { itemId: string; price: number }[] } | null>(null)
   const [bookmarks, setBookmarks] = useState<any[]>([])
@@ -30,6 +30,7 @@ export default function Profile() {
             reposts: p.reposts || 0,
             views: p.views || 0,
             ownerId: p.ownerId,
+            price: typeof p.price === 'number' ? p.price : undefined,
           })))
         )
         .catch(() => setAllPosts([]))
@@ -60,6 +61,7 @@ export default function Profile() {
     { key: 'bookmarks', label: 'Bookmarks' },
     { key: 'followers', label: 'Followers' },
     { key: 'following', label: 'Following' },
+    { key: 'account', label: 'Account' },
   ]
 
   useEffect(() => {
@@ -72,7 +74,12 @@ export default function Profile() {
 
   return (
     <Card className="p-4">
-      <h2 className="text-xl font-semibold mb-2">Profile</h2>
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-xl font-semibold">Profile</h2>
+        {me && (
+          <div className="text-xs text-gray-400">Logged in as: <span className="text-gray-200">{me.username}</span> <span className="ml-2 opacity-70">({me.id || me._id})</span></div>
+        )}
+      </div>
       <p className="text-gray-400 mb-4">Bio, stats, media</p>
 
       <div className="flex gap-3 border-b border-gray-800 mb-4">
@@ -83,7 +90,15 @@ export default function Profile() {
 
       {tab === 'posts' && (
         <div className="space-y-4">
-          {allPosts.length === 0 && <div className="text-gray-400">No posts yet.</div>}
+          {allPosts.length === 0 && (
+            <div className="text-gray-400 flex items-center justify-between bg-black/30 p-3 rounded">
+              <div>
+                <div className="font-medium">No posts yet</div>
+                <div className="text-sm text-gray-500">Use Upload to add your first post.</div>
+              </div>
+              <a href="/upload" className="px-3 py-2 bg-gold text-black rounded">Upload</a>
+            </div>
+          )}
           {allPosts.map((p: any) => <ContentCard key={p._id || p.id} item={p} />)}
         </div>
       )}
@@ -181,6 +196,16 @@ export default function Profile() {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {tab === 'account' && (
+        <div className="space-y-3 text-gray-300">
+          <div className="text-sm">Use this to sign out and switch accounts.</div>
+          <button
+            onClick={() => { if (typeof window !== 'undefined') { localStorage.removeItem('token'); window.location.href = '/' } }}
+            className="px-3 py-2 bg-red-600 rounded text-white w-fit"
+          >Logout</button>
         </div>
       )}
     </Card>
