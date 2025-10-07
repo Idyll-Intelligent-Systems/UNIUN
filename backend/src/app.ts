@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
 import { setupMetrics, register } from './metrics';
 import authRoutes from './routes/auth'
 import postsRoutes from './routes/posts'
@@ -11,13 +13,23 @@ import turnRoutes from './routes/turn'
 import devRoutes from './routes/dev'
 import profileRoutes from './routes/profile'
 import searchRoutes from './routes/search'
+import usersRoutes from './routes/users'
+import messagesRoutes from './routes/messages'
 import 'express-async-errors'
 import path from 'path'
 
 const app = express();
+app.set('trust proxy', 1)
 app.use(cors());
+app.use(helmet({
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+}))
+app.use(rateLimit({ windowMs: 60 * 1000, max: 600 }))
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')))
+// Serve uploads from both possible locations (dist/../uploads and dist/../../uploads) to cover
+// dev and docker layouts; first existing path will serve.
+app.use('/uploads', express.static(path.resolve(__dirname, '..', 'uploads')))
+app.use('/uploads', express.static(path.resolve(__dirname, '..', '..', 'uploads')))
 app.use('/avatars', express.static(path.join(__dirname, '..', 'avatars')))
 
 setupMetrics();
@@ -40,11 +52,14 @@ app.use('/api/cart', cartRoutes)
 app.use('/api/turn', turnRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/search', searchRoutes)
+app.use('/api/users', usersRoutes)
+app.use('/api/messages', messagesRoutes)
 if (process.env.NODE_ENV !== 'production') {
   app.use('/api/dev', devRoutes)
 }
 
-app.use((err: any, req: any, res: any) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: any, req: any, res: any, next: any) => {
   console.error(err)
   res.status(500).json({ error: 'internal' })
 })

@@ -13,6 +13,7 @@ export default function Home() {
         id: p.id || p._id || (p._id && p._id.toString()),
         title: p.title,
         mediaType: p.mediaType || 'image',
+        mediaUrl: p.mediaUrl || null,
         likes: p.likes || 0,
         replies: p.replies || 0,
         reposts: p.reposts || 0,

@@ -12,6 +12,7 @@ export default function ContentCard({ item }: { item: any }) {
   const [loading, setLoading] = useState(false)
   const [reply, setReply] = useState('')
   const [replies, setReplies] = useState(item?.replies || 0)
+  const [me, setMe] = useState<any>(null)
 
   // normalize id value (Mongo returns _id sometimes)
   const safeId = item?.id || (item?._id ? (typeof item._id === 'string' ? item._id : item._id.toString()) : undefined)
@@ -91,6 +92,22 @@ export default function ContentCard({ item }: { item: any }) {
   }
 
   const media = (item?.mediaUrl && typeof item.mediaUrl === 'string') ? item.mediaUrl : null
+  // load current user to decide owner controls
+  useState(() => {
+    api.me().then(setMe).catch(()=>setMe(null))
+  })
+
+  async function onDelete() {
+    if (!safeId) return
+    if (!confirm('Delete this post?')) return
+    try {
+      await api.deletePost(safeId)
+      // Optimistically remove from page by dispatching a DOM event that parent pages can handle
+      if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('post:deleted', { detail: { id: safeId } }))
+    } catch (e: any) {
+      alert('Delete failed: ' + e.message)
+    }
+  }
   return (
     <Card className="w-full overflow-hidden" >
       <div className="relative w-full h-64 bg-gradient-to-t from-black to-gray-900 flex items-center justify-center overflow-hidden">
@@ -107,7 +124,12 @@ export default function ContentCard({ item }: { item: any }) {
         )}
       </div>
       <div className="p-4">
-        <h3 className="text-white font-semibold">{item?.title}</h3>
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-white font-semibold truncate">{item?.title}</h3>
+          {(me && (me.id === item?.ownerId || me._id === item?.ownerId)) && (
+            <button onClick={onDelete} className="text-red-400 text-sm hover:text-red-300">Delete</button>
+          )}
+        </div>
         <div className="mt-3 flex items-center justify-between text-gray-300 text-sm">
           <div className="flex gap-4 items-center">
             <button data-testid="like-btn" onClick={onLike} className="flex items-center gap-1">

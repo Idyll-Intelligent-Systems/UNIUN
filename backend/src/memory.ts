@@ -7,6 +7,7 @@ export type MemCart = { userId: string; items: { itemId: string; price: number }
 export type MemBookmark = { userId: string; postId: string; createdAt: Date }
 export type MemRepost = { userId: string; postId: string; createdAt: Date }
 export type MemReply = { userId: string; postId: string; text: string; createdAt: Date }
+export type MemFollow = { followerId: string; followeeId: string; createdAt: Date }
 
 export const mem = {
   users: [] as MemUser[],
@@ -15,6 +16,7 @@ export const mem = {
   bookmarks: [] as MemBookmark[],
   reposts: [] as MemRepost[],
   replies: [] as MemReply[],
+  followers: [] as MemFollow[],
 }
 
 // Poor-man's ObjectId-like generator (24 hex chars)

@@ -1,22 +1,55 @@
 import { Card } from '../components/ui/Card'
 import { useEffect, useState } from 'react'
-import { listPosts, getCart, listBookmarks, listReposts, listReplies } from '../utils/api'
+import Image from 'next/image'
+import { listPosts, getCart, listBookmarks, listReposts, listReplies, me as getMe, followUser, unfollowUser } from '../utils/api'
 import ContentCard from '../components/ContentCard'
 
 export default function Profile() {
-  const [tab, setTab] = useState<'posts'|'reposts'|'replies'|'cart'|'bookmarks'>('posts')
+  const [tab, setTab] = useState<'posts'|'reposts'|'replies'|'cart'|'bookmarks'|'followers'|'following'>('posts')
   const [allPosts, setAllPosts] = useState<any[]>([])
   const [cart, setCart] = useState<{ items: { itemId: string; price: number }[] } | null>(null)
   const [bookmarks, setBookmarks] = useState<any[]>([])
   const [reposts, setReposts] = useState<any[]>([])
   const [replies, setReplies] = useState<any[]>([])
+  const [me, setMe] = useState<any>(null)
+  const [followers, setFollowers] = useState<any[]>([])
+  const [following, setFollowing] = useState<any[]>([])
 
   useEffect(() => {
-    listPosts().then(setAllPosts).catch(() => setAllPosts([]))
-    getCart().then(setCart).catch(() => setCart({ items: [] }))
+    const loadPosts = () =>
+      listPosts()
+        .then((items: any[]) =>
+          setAllPosts((items || []).map((p: any) => ({
+            id: p.id || p._id || (p._id && p._id.toString()),
+            _id: p._id || p.id,
+            title: p.title,
+            mediaType: p.mediaType || 'image',
+            mediaUrl: p.mediaUrl || null,
+            likes: p.likes || 0,
+            replies: p.replies || 0,
+            reposts: p.reposts || 0,
+            views: p.views || 0,
+            ownerId: p.ownerId,
+          })))
+        )
+        .catch(() => setAllPosts([]))
+
+    loadPosts()
+  getCart().then(setCart).catch(() => setCart({ items: [] }))
     listBookmarks().then(setBookmarks).catch(() => setBookmarks([]))
     listReposts().then(setReposts).catch(() => setReposts([]))
     listReplies().then(setReplies).catch(() => setReplies([]))
+  getMe().then(setMe).catch(()=>setMe(null))
+
+    const onDel = (e: any) => {
+      const id = e?.detail?.id
+      if (!id) return
+      setAllPosts((ps) => ps.filter((p) => (p._id || p.id) !== id))
+    }
+    if (typeof window !== 'undefined') window.addEventListener('post:deleted', onDel)
+    return () => {
+      if (typeof window !== 'undefined') window.removeEventListener('post:deleted', onDel)
+    }
   }, [])
 
   const tabs: { key: typeof tab; label: string }[] = [
@@ -25,7 +58,17 @@ export default function Profile() {
     { key: 'replies', label: 'Replies' },
     { key: 'cart', label: 'Cart' },
     { key: 'bookmarks', label: 'Bookmarks' },
+    { key: 'followers', label: 'Followers' },
+    { key: 'following', label: 'Following' },
   ]
+
+  useEffect(() => {
+    if (!me?.id && !me?._id) return
+    const id = me.id || me._id
+    // ask backend to expand follower/following into profiles
+    fetch(`${(process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4002')}/api/users/${id}/followers?expand=1`).then(r=>r.json()).then(setFollowers).catch(()=>setFollowers([]))
+    fetch(`${(process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4002')}/api/users/${id}/following?expand=1`).then(r=>r.json()).then(setFollowing).catch(()=>setFollowing([]))
+  }, [me])
 
   return (
     <Card className="p-4">
@@ -104,6 +147,40 @@ export default function Profile() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {tab === 'followers' && (
+        <div className="space-y-2 text-gray-300">
+          {followers.length===0 && <div className="text-gray-500">No followers yet.</div>}
+          <ul className="space-y-2">
+            {followers.map((u:any, i:number)=> (
+              <li key={u.id || i} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {u.avatarUrl && <Image src={u.avatarUrl} alt={u.username} width={24} height={24} className="rounded-full" />}
+                  <span className="text-gray-200">{u.username}</span>
+                </div>
+                <button onClick={()=>followUser(u.id || u._id)} className="px-2 py-1 text-sm bg-gold rounded text-black">Follow back</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {tab === 'following' && (
+        <div className="space-y-2 text-gray-300">
+          {following.length===0 && <div className="text-gray-500">Not following anyone yet.</div>}
+          <ul className="space-y-2">
+            {following.map((u:any, i:number)=> (
+              <li key={u.id || i} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {u.avatarUrl && <Image src={u.avatarUrl} alt={u.username} width={24} height={24} className="rounded-full" />}
+                  <span className="text-gray-200">{u.username}</span>
+                </div>
+                <button onClick={()=>unfollowUser(u.id || u._id)} className="px-2 py-1 text-sm bg-gray-700 rounded">Unfollow</button>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </Card>

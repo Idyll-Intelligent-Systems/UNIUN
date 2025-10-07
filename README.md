@@ -177,3 +177,38 @@ Environment knobs:
 - NEXT_PUBLIC_API_URL: defaults to <http://localhost:${BACKEND_PORT}>
 
 Logs are written under .logs/backend.log and .logs/frontend.log.
+
+## Docker local run
+
+Prerequisites:
+
+- Docker Desktop running (macOS: launch the Docker Desktop app first)
+- Docker Compose v2
+
+Build and run the full stack:
+
+<!-- markdownlint-disable MD046 -->
+```sh
+docker compose build
+docker compose up
+```
+<!-- markdownlint-enable MD046 -->
+
+Services:
+
+- Frontend: <http://localhost:3000>
+- Backend: <http://localhost:4000> (health at /health)
+- MongoDB: localhost:27017
+- Neo4j: <http://localhost:7474> (bolt: 7687)
+- Prometheus: <http://localhost:9090>
+- Grafana: <http://localhost:3001> (admin/admin)
+
+Environment vars (optional):
+
+- NEXT_PUBLIC_GOOGLE_CLIENT_ID (frontend)
+- GOOGLE_CLIENT_ID (backend)
+
+Troubleshooting:
+
+- Error: Cannot connect to the Docker daemon… Ensure Docker Desktop is running, then retry `docker compose build`.
+- On Apple Silicon, Milvus may require emulation (`platform: linux/amd64`) or can be commented out for local dev.

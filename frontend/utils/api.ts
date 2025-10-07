@@ -30,6 +30,10 @@ export async function listPosts() {
   return api('/api/posts')
 }
 
+export async function deletePost(postId: string) {
+  return api(`/api/posts/${postId}`, { method: 'DELETE' })
+}
+
 // interactions
 export async function likePost(postId: string) {
   return api(`/api/interactions/${postId}/like`, { method: 'POST' })
@@ -64,5 +68,18 @@ export async function listBookmarks() { return api('/api/profile/bookmarks') }
 export async function listReposts() { return api('/api/profile/reposts') }
 export async function listReplies() { return api('/api/profile/replies') }
 
-const exported = { api, register, login, createPost, listPosts, likePost, repostPost, bookmarkPost, replyPost, addToCart, getCart, checkoutCart, listBookmarks, listReposts, listReplies }
+// users
+export async function me() { return api('/api/users/me') }
+export async function followUser(userId: string) { return api(`/api/users/follow/${userId}`, { method: 'POST' }) }
+export async function unfollowUser(userId: string) { return api(`/api/users/unfollow/${userId}`, { method: 'POST' }) }
+export async function listFollowers(userId: string) { return api(`/api/users/${userId}/followers`) }
+export async function listFollowing(userId: string) { return api(`/api/users/${userId}/following`) }
+
+// messages
+export async function listConversations() { return api('/api/messages') }
+export async function unreadCount() { return api('/api/messages/unread-count') }
+export async function getThread(withUserId: string) { return api(`/api/messages/${withUserId}`) }
+export async function sendMessage(withUserId: string, text: string) { return api(`/api/messages/${withUserId}`, { method: 'POST', body: JSON.stringify({ text }) }) }
+
+const exported = { api, register, login, createPost, listPosts, deletePost, likePost, repostPost, bookmarkPost, replyPost, addToCart, getCart, checkoutCart, listBookmarks, listReposts, listReplies, me, followUser, unfollowUser, listFollowers, listFollowing, listConversations, unreadCount, getThread, sendMessage }
 export default exported
