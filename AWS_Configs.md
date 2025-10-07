@@ -12,8 +12,11 @@
 
     ECR: 791704693413.dkr.ecr.ap-southeast-1.amazonaws.com/un1un1
 
-    AwS ACCESS KEY: AKIA3QVKG5KSVLNSG6F2
+    NOTE: Do NOT commit real cloud credentials in this repository.
+    Rotate and revoke any exposed keys immediately in AWS IAM.
 
-    AWS SECRET ACCESS KEY: WprJ+mWFBpWkaB6aOEy2qjp1dLZVVcV62rDk3eQH
+    AWS ACCESS KEY ID: <set via environment/secret manager>
+
+    AWS SECRET ACCESS KEY: <set via environment/secret manager>
     
     AWS Region: ap-southeast-1
