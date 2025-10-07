@@ -266,4 +266,36 @@ router.get('/:id/following', async (req: any, res: any) => {
   res.json(list)
 })
 
+// User meta: id, username, avatarUrl, bio, followersCount, followingCount, postsCount
+router.get('/:id/meta', async (req: any, res: any) => {
+  const id = String(req.params.id)
+  try {
+    const db = getMongoClient().db()
+    const user = await db.collection('users').findOne({ _id: (id as any) }, { projection: { password: 0 } } as any)
+    if (user) {
+      let followersCount = 0, followingCount = 0, postsCount = 0
+      try { followersCount = await db.collection('follows').countDocuments({ followeeId: (user as any)._id }) } catch {}
+      try { followingCount = await db.collection('follows').countDocuments({ followerId: (user as any)._id }) } catch {}
+      try { postsCount = await db.collection('posts').countDocuments({ ownerId: (user as any)._id }) } catch {}
+      return res.json({ id: (user as any)._id, username: (user as any).username, avatarUrl: getAvatarFor((user as any).username), bio: (user as any).bio || null, followersCount, followingCount, postsCount })
+    }
+  } catch (e) { /* ignore and fall back */ }
+  // Memory fallback
+  const m = mem.users.find(u => String(u._id) === id)
+  if (m) {
+    const followersCount = mem.followers.filter(f => f.followeeId === id).length
+    const followingCount = mem.followers.filter(f => f.followerId === id).length
+    const postsCount = mem.posts.filter(p => String(p.ownerId) === id).length
+    return res.json({ id: m._id, username: m.username, avatarUrl: getAvatarFor(m.username), bio: (m as any).bio || null, followersCount, followingCount, postsCount })
+  }
+  return res.status(404).json({ error: 'not found' })
+})
+
+// Alias: GET /:id returns same meta
+router.get('/:id', async (req: any, res: any) => {
+  // delegate to /:id/meta logic
+  (req.url = '/meta'), (req.params = { ...req.params })
+  return (router as any).handle(req, res)
+})
+
 export default router

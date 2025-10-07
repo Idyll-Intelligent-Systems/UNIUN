@@ -2,8 +2,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { Card } from '../components/ui/Card'
 import api from '../utils/api'
 import Image from 'next/image'
+import { useToast } from '../components/ui/Toast'
 
 export default function SearchPage() {
+  const { show } = useToast()
   const [q, setQ] = useState('')
   const [users, setUsers] = useState<any[]>([])
   const [allUsers, setAllUsers] = useState<any[]>([])
@@ -21,6 +23,7 @@ export default function SearchPage() {
       const data = await api.api(`/api/search?q=${encodeURIComponent(q)}`)
       setUsers(data.users || [])
       setPosts(data.posts || [])
+      show('Search loaded', 'success')
     } catch { setUsers([]); setPosts([]) }
   }
 
@@ -34,12 +37,13 @@ export default function SearchPage() {
         setSort(nextSort)
         setDir(nextDir)
         setLimit(nextLimit)
+        show('Directory updated', 'info')
       } else if (Array.isArray(data)) {
         setAllUsers(data)
         setTotal(data.length)
       }
     } catch { setAllUsers([]); setTotal(0) }
-  }, [page, sort, dir, limit])
+  }, [page, sort, dir, limit, show])
 
   useEffect(() => {
     api.me().then(async (m) => {
@@ -64,13 +68,15 @@ export default function SearchPage() {
         setFollowing(prev => prev.filter(x => x !== uid))
         // optimistic counts update on directory
         setAllUsers(prev => prev.map(u => (u.id===uid || u._id===uid) ? { ...u, followersCount: Math.max(0, Number(u.followersCount||0) - 1) } : u))
+        show('Unfollowed', 'success')
       } else {
         await api.followUser(uid)
         setFollowing(prev => [...prev, uid])
         setAllUsers(prev => prev.map(u => (u.id===uid || u._id===uid) ? { ...u, followersCount: Number(u.followersCount||0) + 1 } : u))
+        show('Followed', 'success')
       }
     } catch (e: any) {
-      alert('Follow failed: ' + e.message)
+      show('Follow action failed', 'error')
     }
   }
 

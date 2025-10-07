@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -10,3 +8,5 @@ declare global {
 }
 
 export {}
+
+declare module '*.css'

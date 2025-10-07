@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
 import Image from 'next/image'
 import { Card } from '../components/ui/Card'
 import api from '../utils/api'
@@ -6,6 +7,7 @@ import api from '../utils/api'
 type Msg = { id: string; from: string; to: string; text: string; createdAt: string }
 
 export default function MessagesDirect() {
+  const router = useRouter()
   const [users, setUsers] = useState<any[]>([])
   const [followingOnly, setFollowingOnly] = useState<any[]>([])
   const [me, setMe] = useState<any>(null)
@@ -47,6 +49,17 @@ export default function MessagesDirect() {
     loadSummaries()
     return () => { if (summaryTimerRef.current) { clearTimeout(summaryTimerRef.current); summaryTimerRef.current = null } }
   }, [])
+
+  // If URL contains ?with=<userId>, auto-open that thread once users load
+  useEffect(() => {
+    const withId = (router.query.with as string) || ''
+    if (!withId) return
+    // ensure we have a token to fetch thread; try after a short delay if needed
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+    if (!token) return
+    loadThread(withId)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.query.with])
 
   async function fetchUsers() {
     try {

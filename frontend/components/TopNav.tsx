@@ -5,12 +5,14 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import api from '../utils/api'
 import Image from 'next/image'
+import { useToast } from './ui/Toast'
 
 export default function TopNav({ onOpenAuth }: { onOpenAuth?: () => void }) {
   const router = useRouter()
   const [unread, setUnread] = useState<number>(0)
   const [authed, setAuthed] = useState<boolean>(false)
   const [me, setMe] = useState<any>(null)
+  const { show } = useToast()
 
   useEffect(() => {
     let timer: any
@@ -33,9 +35,9 @@ export default function TopNav({ onOpenAuth }: { onOpenAuth?: () => void }) {
         <div className="text-gold font-bold cursor-pointer" onClick={() => onOpenAuth && onOpenAuth()}>UNIUN</div>
       </div>
       <div className="flex items-center gap-4">
-        <Button onClick={() => router.push('/search')}><Icons.Search size={16} /> Search</Button>
+  <Button onClick={() => { show('Opening search', 'info'); router.push('/search') }}><Icons.Search size={16} /> Search</Button>
         {authed && (
-          <Button onClick={() => router.push('/messages-direct')} className="relative">
+          <Button onClick={() => { show('Opening messages', 'info'); router.push('/messages-direct') }} className="relative">
             <Icons.MessageSquare size={16} /> Messages
             {unread>0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">{unread}</span>
@@ -43,7 +45,7 @@ export default function TopNav({ onOpenAuth }: { onOpenAuth?: () => void }) {
           </Button>
         )}
         {authed ? (
-          <Button onClick={() => router.push('/upload')}><Icons.Upload size={16} /> Upload</Button>
+          <Button onClick={() => { show('Opening upload', 'info'); router.push('/upload') }}><Icons.Upload size={16} /> Upload</Button>
         ) : (
           <Button onClick={() => onOpenAuth && onOpenAuth()}><Icons.Upload size={16} /> Upload</Button>
         )}

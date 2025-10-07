@@ -84,9 +84,12 @@ export default function PublicUserProfile() {
                 <div className="text-xs text-gray-400 mt-1">Followers: {followersList.length} · Following: {followingList.length}</div>
               </div>
             </div>
-            <button onClick={()=>toggleFollow(user.id || user._id)} className="px-3 py-2 bg-gold rounded text-black">
-              {myFollowing.includes(user.id || user._id) ? 'Unfollow' : 'Follow'}
-            </button>
+            <div className="flex gap-2">
+              <button onClick={()=>router.push(`/messages-direct?with=${encodeURIComponent(String(user.id || user._id))}`)} className="px-3 py-2 bg-gray-700 rounded text-white">Message</button>
+              <button onClick={()=>toggleFollow(user.id || user._id)} className="px-3 py-2 bg-gold rounded text-black">
+                {myFollowing.includes(user.id || user._id) ? 'Unfollow' : 'Follow'}
+              </button>
+            </div>
           </div>
           <div className="flex gap-3 border-b border-gray-800 mb-3">
             {(['posts','followers','following'] as const).map(t => (
@@ -118,10 +121,16 @@ export default function PublicUserProfile() {
                       <div className="flex items-center gap-2">
                         {u.avatarUrl && <Image src={u.avatarUrl} alt={u.username} width={24} height={24} className="rounded-full" />}
                         <span className="text-gray-200">{u.username}</span>
+                        {!myFollowing.includes(u.id || u._id) && (
+                          <span className="ml-2 text-[10px] text-gray-400 border border-gray-700 rounded px-1 py-0.5">Follow back</span>
+                        )}
                       </div>
-                      <button onClick={()=>toggleFollow(u.id || u._id)} className="px-2 py-1 text-sm bg-gold rounded text-black">
-                        {myFollowing.includes(u.id || u._id) ? 'Unfollow' : 'Follow'}
-                      </button>
+                      <div className="flex gap-2">
+                        <button onClick={()=>router.push(`/messages-direct?with=${encodeURIComponent(String(u.id || u._id))}`)} className="px-2 py-1 text-sm bg-gray-700 rounded text-white">Message</button>
+                        <button onClick={()=>toggleFollow(u.id || u._id)} className="px-2 py-1 text-sm bg-gold rounded text-black">
+                          {myFollowing.includes(u.id || u._id) ? 'Unfollow' : 'Follow'}
+                        </button>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -142,9 +151,12 @@ export default function PublicUserProfile() {
                         {u.avatarUrl && <Image src={u.avatarUrl} alt={u.username} width={24} height={24} className="rounded-full" />}
                         <span className="text-gray-200">{u.username}</span>
                       </div>
-                      <button onClick={()=>toggleFollow(u.id || u._id)} className="px-2 py-1 text-sm bg-gold rounded text-black">
-                        {myFollowing.includes(u.id || u._id) ? 'Unfollow' : 'Follow'}
-                      </button>
+                      <div className="flex gap-2">
+                        <button onClick={()=>router.push(`/messages-direct?with=${encodeURIComponent(String(u.id || u._id))}`)} className="px-2 py-1 text-sm bg-gray-700 rounded text-white">Message</button>
+                        <button onClick={()=>toggleFollow(u.id || u._id)} className="px-2 py-1 text-sm bg-gold rounded text-black">
+                          {myFollowing.includes(u.id || u._id) ? 'Unfollow' : 'Follow'}
+                        </button>
+                      </div>
                     </li>
                   ))}
                 </ul>

@@ -3,6 +3,7 @@ import { createPost } from '../utils/api'
 import Button from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import AuthModal from '../components/AuthModal'
+import { useToast } from '../components/ui/Toast'
 
 export default function Upload() {
   const [title, setTitle] = useState('')
@@ -10,6 +11,7 @@ export default function Upload() {
     const [file, setFile] = useState<File | null>(null)
   const [authed, setAuthed] = useState(true)
   const [price, setPrice] = useState<string>('')
+  const { show } = useToast()
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
@@ -18,7 +20,7 @@ export default function Upload() {
 
   async function submit() {
     try {
-      if (!title.trim()) { alert('Enter a title'); return }
+  if (!title.trim()) { show('Enter a title', 'warning'); return }
         let publicUrl: string | undefined
       if (file) {
         try {
@@ -29,7 +31,7 @@ export default function Upload() {
               headers: { 'Authorization': typeof window !== 'undefined' ? `Bearer ${localStorage.getItem('token') || ''}` : '' } as any,
               body: form,
             })
-            if (!uploadRes.ok) return alert('Upload failed')
+            if (!uploadRes.ok) { show('Upload failed', 'error'); return }
             const data = await uploadRes.json()
             publicUrl = data.publicUrl
         } catch (e) {
@@ -40,10 +42,11 @@ export default function Upload() {
         await createPost(title, mediaType, publicUrl, (isFinite(parsedPrice as number) ? (parsedPrice as number) : undefined))
       setTitle('')
       setPrice('')
+      show('Upload succeeded', 'success')
       // Navigate home so user can see the post
       if (typeof window !== 'undefined') window.location.href = '/'
     } catch (err: any) {
-      alert('Error: ' + err.message)
+      show('Upload failed', 'error')
     }
   }
 

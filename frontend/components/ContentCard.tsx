@@ -4,6 +4,7 @@ import Icons from './ui/icons'
 import { useState } from 'react'
 import api from '../utils/api'
 import Image from 'next/image'
+import { useToast } from './ui/Toast'
 
 export default function ContentCard({ item }: { item: any }) {
   const [likes, setLikes] = useState(item?.likes || 0)
@@ -13,6 +14,8 @@ export default function ContentCard({ item }: { item: any }) {
   const [reply, setReply] = useState('')
   const [replies, setReplies] = useState(item?.replies || 0)
   const [me, setMe] = useState<any>(null)
+  const [liked, setLiked] = useState(false)
+  const { show } = useToast()
 
   // normalize id value (Mongo returns _id sometimes)
   const safeId = item?.id || (item?._id ? (typeof item._id === 'string' ? item._id : item._id.toString()) : undefined)
@@ -22,6 +25,8 @@ export default function ContentCard({ item }: { item: any }) {
     setLikes((l: number) => l + 1)
     try {
       await api.likePost(safeId)
+      setLiked(true)
+      show('Liked', 'success')
       // rehydrate this post from server for strong consistency
       try {
         const posts = await api.listPosts()
@@ -36,6 +41,7 @@ export default function ContentCard({ item }: { item: any }) {
     } catch (e) {
       setLikes((l: number) => l - 1)
       console.error('like failed', e)
+      show('Like failed', 'error')
     }
   }
 
@@ -44,6 +50,7 @@ export default function ContentCard({ item }: { item: any }) {
     setReposts((r: number) => r + 1)
     try {
       await api.repostPost(safeId)
+      show('Reposted', 'success')
       try {
         const posts = await api.listPosts()
         const fresh = (posts || []).find((p: any) => (p.id || (p._id && p._id.toString())) === safeId)
@@ -55,6 +62,7 @@ export default function ContentCard({ item }: { item: any }) {
     } catch (e) {
       setReposts((r: number) => r - 1)
       console.error('repost failed', e)
+      show('Repost failed', 'error')
     }
   }
 
@@ -63,6 +71,7 @@ export default function ContentCard({ item }: { item: any }) {
     setBookmarked(b => !b)
     try {
       await api.bookmarkPost(safeId)
+      show(bookmarked ? 'Removed from wishlist' : 'Added to wishlist', 'success')
       // optional rehydrate
       try {
         const posts = await api.listPosts()
@@ -75,6 +84,7 @@ export default function ContentCard({ item }: { item: any }) {
     } catch (e) {
       setBookmarked(b => !b)
       console.error('bookmark failed', e)
+      show('Wishlist update failed', 'error')
     }
   }
 
@@ -85,8 +95,10 @@ export default function ContentCard({ item }: { item: any }) {
       // api expects { id, title }
       const p = typeof item?.price === 'number' && isFinite(item.price) ? item.price : undefined
       await api.addToCart({ id: safeId, title: item?.title, price: p })
+      show('Added to cart', 'success')
     } catch (e) {
       console.error('add to cart failed', e)
+      show('Add to cart failed', 'error')
     } finally {
       setLoading(false)
     }
@@ -105,8 +117,10 @@ export default function ContentCard({ item }: { item: any }) {
       await api.deletePost(safeId)
       // Optimistically remove from page by dispatching a DOM event that parent pages can handle
       if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('post:deleted', { detail: { id: safeId } }))
+      show('Post deleted', 'success')
     } catch (e: any) {
       alert('Delete failed: ' + e.message)
+      show('Delete failed', 'error')
     }
   }
   return (
@@ -135,7 +149,7 @@ export default function ContentCard({ item }: { item: any }) {
         </div>
         <div className="mt-3 flex items-center justify-between text-gray-300 text-sm">
           <div className="flex gap-4 items-center">
-            <button data-testid="like-btn" onClick={onLike} className="flex items-center gap-1">
+            <button data-testid="like-btn" onClick={onLike} className={`flex items-center gap-1 ${liked ? 'text-red-500' : ''}`}>
               <Icons.Heart size={16} />{likes}
             </button>
             <div className="flex items-center gap-1"><Icons.Message size={16} />{replies}</div>
@@ -155,9 +169,10 @@ export default function ContentCard({ item }: { item: any }) {
         <input value={reply} onChange={e=>setReply(e.target.value)} className="flex-1 p-2 bg-gray-800 rounded" placeholder="Reply…" />
         <Button onClick={async ()=>{
           if (!safeId || !reply.trim()) return
+          if (!reply.trim()) { show('Reply cannot be empty', 'warning'); return }
           const text = reply
           setReply('')
-          try { await api.replyPost(safeId, text); setReplies((r: number)=>r+1) } catch(e){ console.error('reply failed', e) }
+          try { await api.replyPost(safeId, text); setReplies((r: number)=>r+1); show('Reply posted', 'success') } catch(e){ console.error('reply failed', e); show('Reply failed', 'error') }
         }}>Reply</Button>
       </div>
     </Card>

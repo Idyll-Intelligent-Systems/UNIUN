@@ -15,29 +15,29 @@
   ],
   "posts": [
     {
-      "_id": "5411844d5d090b35407dc00d",
-      "title": "New Priced Content",
+      "_id": "b45d093b2e1dda6684fb8ba3",
+      "title": "new uo",
       "mediaType": "image",
-      "mediaUrl": "/uploads/images/1759807479763-c6f5f12306.jpeg",
+      "mediaUrl": "/uploads/images/1759840734045-104d58d030.png",
+      "ownerId": "78133b114583703554fecea8",
+      "likes": 1,
+      "replies": 0,
+      "reposts": 2,
+      "views": 0,
+      "createdAt": "2025-10-07T12:38:54.052Z",
+      "price": 9.99
+    },
+    {
+      "_id": "461c4d1a9300058b8d170bd0",
+      "title": "New Video",
+      "mediaType": "video",
+      "mediaUrl": "/uploads/video/1759808486805-0fdf72758d.MP4",
       "ownerId": "78133b114583703554fecea8",
       "likes": 0,
       "replies": 0,
       "reposts": 0,
       "views": 0,
-      "createdAt": "2025-10-07T03:24:39.784Z",
-      "price": 9.99
-    },
-    {
-      "_id": "f196682c6409d20cdabc673d",
-      "title": "PrDeep upload 1",
-      "mediaType": "image",
-      "mediaUrl": "/uploads/images/1759691100503-90bea7e88d.jpeg",
-      "ownerId": "78133b114583703554fecea8",
-      "likes": 2,
-      "replies": 0,
-      "reposts": 0,
-      "views": 0,
-      "createdAt": "2025-10-05T19:05:00.507Z"
+      "createdAt": "2025-10-07T03:41:26.810Z"
     },
     {
       "_id": "480699a76fd1aeab84d14139",
@@ -129,6 +129,16 @@
       "userId": "78133b114583703554fecea8",
       "postId": "480699a76fd1aeab84d14139",
       "createdAt": "2025-10-05T18:58:13.945Z"
+    },
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "5411844d5d090b35407dc00d",
+      "createdAt": "2025-10-07T03:34:48.996Z"
+    },
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "b45d093b2e1dda6684fb8ba3",
+      "createdAt": "2025-10-07T12:39:08.357Z"
     }
   ],
   "reposts": [
@@ -141,6 +151,16 @@
       "userId": "78133b114583703554fecea8",
       "postId": "480699a76fd1aeab84d14139",
       "createdAt": "2025-10-05T18:58:08.306Z"
+    },
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "b45d093b2e1dda6684fb8ba3",
+      "createdAt": "2025-10-07T12:39:20.719Z"
+    },
+    {
+      "userId": "78133b114583703554fecea8",
+      "postId": "b45d093b2e1dda6684fb8ba3",
+      "createdAt": "2025-10-07T12:39:20.859Z"
     }
   ],
   "replies": [
@@ -192,6 +212,14 @@
         {
           "itemId": "480699a76fd1aeab84d14139",
           "price": 0
+        },
+        {
+          "itemId": "5411844d5d090b35407dc00d",
+          "price": 9.99
+        },
+        {
+          "itemId": "b45d093b2e1dda6684fb8ba3",
+          "price": 9.99
         }
       ]
     },
