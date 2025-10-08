@@ -107,19 +107,25 @@ export default function ContentCard({ item }: { item: any }) {
 
   const media = normalizeMediaUrl(item?.mediaUrl)
   // load current user to decide owner controls
-  useState(() => {
-    api.me().then(async (m:any) => {
-      setMe(m)
-      if (safeId) {
-        try {
-          const s:any = await api.interactionStatus(safeId)
-          setLiked(!!s?.liked)
-          setReposted(!!s?.reposted)
-          setBookmarked(!!s?.bookmarked)
-        } catch { /* ignore */ }
-      }
-    }).catch(()=>setMe(null))
-  })
+  useEffect(() => {
+    let mounted = true
+    api.me()
+      .then(async (m:any) => {
+        if (!mounted) return
+        setMe(m)
+        if (safeId) {
+          try {
+            const s:any = await api.interactionStatus(safeId)
+            if (!mounted) return
+            setLiked(!!s?.liked)
+            setReposted(!!s?.reposted)
+            setBookmarked(!!s?.bookmarked)
+          } catch { /* ignore */ }
+        }
+      })
+      .catch(() => { if (mounted) setMe(null) })
+    return () => { mounted = false }
+  }, [safeId])
 
   // unique view tracking: fire once when card first enters viewport
   useEffect(() => {

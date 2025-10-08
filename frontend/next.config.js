@@ -23,6 +23,11 @@ const nextConfig = {
   reactStrictMode: true,
   images: { remotePatterns, unoptimized: true },
   eslint: { ignoreDuringBuilds: true },
+  async redirects() {
+    return [
+      { source: '/trending', destination: '/trends', permanent: true },
+    ]
+  },
   async rewrites() {
     if (!apiBase) return []
     return [

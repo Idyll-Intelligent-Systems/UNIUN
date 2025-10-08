@@ -1,73 +1,35 @@
-import React, { useEffect, useMemo, useRef } from 'react'
-import dynamic from 'next/dynamic'
-import data from '@emoji-mart/data'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
-// Load the Picker from emoji-mart dynamically to avoid SSR issues. Some builds export {Picker}, some default.
-const Picker: any = dynamic(async () => {
-  const mod: any = await import('emoji-mart')
-  return mod.Picker || mod.default
-}, { ssr: false })
+// Lightweight, dependency-free emoji picker to avoid client-side exceptions.
+const EMOJIS = ['😀','😁','😂','🤣','😅','😊','😍','😘','😎','🤩','🤔','🤨','😐','😴','🤤','😷','🤒','🤕','🤢','🤮','🥳','😇','🥺','😭','😤','😡','👍','👎','👏','🙏','💪','👌','✌️','🤙','🫶','❤️','🧡','💛','💚','💙','💜','🖤','🤍','✨','🔥','🎉','✅','❌','⭐','🌟','⚡','💡','📸','🎧','🎵','🎬','🏆','⚽','🏀','🍕','🍔','🍟','🍩','🍎','🍇','🍓','🍪','☕','🍺','🍷']
 
 export default function EmojiPicker({ onSelect, onClose, anchorClass = '' }: { onSelect: (emoji: string) => void, onClose: () => void, anchorClass?: string }) {
   const ref = useRef<HTMLDivElement | null>(null)
+  const [q, setQ] = useState('')
+  const list = useMemo(() => EMOJIS.filter(e => e.includes(q.trim())), [q])
+
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as any)) onClose()
-    }
+    const onClick = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as any)) onClose() }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('mousedown', onClick)
-    return () => document.removeEventListener('mousedown', onClick)
-  }, [onClose])
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
     document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
+    return () => { document.removeEventListener('mousedown', onClick); document.removeEventListener('keydown', onKey) }
   }, [onClose])
 
-  const locale = useMemo(() => ({
-    search: 'Search emojis',
-    categories: {
-      frequent: 'Recent',
-      people: 'Smileys & People',
-      nature: 'Animals & Nature',
-      foods: 'Food & Drink',
-      activity: 'Activity',
-      places: 'Travel & Places',
-      objects: 'Objects',
-      symbols: 'Symbols',
-      flags: 'Flags',
-    },
-  }), [])
-
-  // WhatsApp-like dropdown: search, categories, recent, skin tones
   return (
-    <div
-      ref={ref}
-      className={`absolute ${anchorClass} mt-2 z-50 glass shadow-premium rounded-xl border border-white/10 p-2 before:content-[''] before:absolute before:-top-2 before:right-6 before:border-8 before:border-transparent before:border-b-white/10 before:drop-shadow`}
-      role="dialog"
-      aria-label="Emoji picker"
-    >
-      <div className="w-[340px] max-w-[92vw]">
-        {/* emoji-mart Picker (dynamically imported to avoid SSR warnings) */}
-        <Picker
-          data={data}
-          onEmojiSelect={(e: any) => onSelect(e?.native || e?.shortcodes || '')}
-          previewPosition="none"
-          skinTonePosition="preview"
-          navPosition="bottom"
-          searchPosition="sticky"
-          emojiButtonRadius="12px"
-          emojiSize={24}
-          perLine={9}
-          categories={['frequent', 'people', 'nature', 'foods', 'activity', 'places', 'objects', 'symbols', 'flags']}
-          dynamicWidth={true}
-          theme="dark"
-          locale={locale as any}
-          autoFocus={true}
-          noCountryFlags={false}
-        />
+    <div ref={ref} className={`absolute ${anchorClass} mt-2 z-50 glass shadow-premium rounded-xl border border-white/10 p-3`} role="dialog" aria-label="Emoji picker">
+      <input
+        placeholder="Search emojis"
+        value={q}
+        onChange={(e)=>setQ(e.target.value)}
+        className="w-full mb-2 p-2 rounded bg-white/10 border border-white/20 text-sm"
+        autoFocus
+      />
+      <div className="grid grid-cols-8 gap-2 max-h-56 overflow-auto">
+        {list.map((e, i) => (
+          <button key={i} className="text-xl hover:scale-110 transition-premium" onClick={() => onSelect(e)} aria-label={`emoji ${e}`}>{e}</button>
+        ))}
+        {list.length === 0 && <div className="col-span-8 text-center text-xs text-gray-500 py-6">No match</div>}
       </div>
     </div>
   )

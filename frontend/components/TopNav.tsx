@@ -89,7 +89,7 @@ export default function TopNav({ onOpenAuth }: { onOpenAuth?: () => void }) {
         </div>
         <div className="flex items-center gap-4">
         <Button onClick={() => { show('Opening search', 'info'); router.push('/search') }} className={router.pathname === '/search' ? 'ring-2 ring-[#3b82f6]' : ''}><Icons.Search size={16} /> Search</Button>
-        <div className="relative">
+        <div className="relative" ref={settingsRef}>
           <Button onClick={() => setShowSettings(s => !s)} aria-label="Open settings" title="Settings"><Settings size={16} /></Button>
           {showSettings && (
             <div className="absolute right-0 mt-2 min-w-[220px] glass shadow-premium rounded-xl border border-white/10 p-3 z-50">
