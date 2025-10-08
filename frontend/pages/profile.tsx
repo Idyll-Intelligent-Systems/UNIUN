@@ -68,14 +68,14 @@ export default function Profile() {
     if (!me?.id && !me?._id) return
     const id = me.id || me._id
     // ask backend to expand follower/following into profiles
-    fetch(`${(process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4002')}/api/users/${id}/followers?expand=1`).then(r=>r.json()).then(setFollowers).catch(()=>setFollowers([]))
-    fetch(`${(process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4002')}/api/users/${id}/following?expand=1`).then(r=>r.json()).then(setFollowing).catch(()=>setFollowing([]))
+  fetch(`/api/users/${id}/followers?expand=1`).then(r=>r.json()).then(setFollowers).catch(()=>setFollowers([]))
+  fetch(`/api/users/${id}/following?expand=1`).then(r=>r.json()).then(setFollowing).catch(()=>setFollowing([]))
   }, [me])
 
   return (
-    <Card className="p-4">
+    <Card className="p-4 glass shadow-premium border border-white/10">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-xl font-semibold">Profile</h2>
+        <h2 className="heading-premium text-2xl">Profile</h2>
         {me && (
           <div className="text-xs text-gray-400">Logged in as: <span className="text-gray-200">{me.username}</span> <span className="ml-2 opacity-70">({me.id || me._id})</span></div>
         )}

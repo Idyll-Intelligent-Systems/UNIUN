@@ -4,6 +4,7 @@ import { mem } from '../memory'
 import { getMongoClient } from '../mongo'
 import fs from 'fs'
 import path from 'path'
+import { ObjectId } from 'mongodb'
 
 const router = Router()
 
@@ -15,10 +16,10 @@ try {
 } catch (e) { /* ignore load avatar map errors */ }
 
 function getAvatarFor(username?: string) {
-  if (!username) return null
+  if (!username) return '/avatars/veee.png'
   if (avatarMap[username]) return avatarMap[username]
-  // fallback convention: /avatars/<lowercased>.png (may 404 if not present)
-  return `/avatars/${username.toLowerCase()}.png`
+  // default to veee.png for all unknown users
+  return '/avatars/veee.png'
 }
 
 // User cards with counts: username, bio (if any), followers/following/posts counts
@@ -76,6 +77,11 @@ router.get('/cards', async (req: any, res: any) => {
       try {
         postsCount = await db.collection('posts').countDocuments({ ownerId: (u as any)._id })
       } catch {}
+      // add memory counts for dev fallback consistency
+      const idStr = String((u as any)._id)
+      followersCount += mem.followers.filter(f => String(f.followeeId) === idStr).length
+      followingCount += mem.followers.filter(f => String(f.followerId) === idStr).length
+      postsCount += mem.posts.filter(p => String(p.ownerId) === idStr).length
       out.push({
         id: (u as any)._id,
         username: (u as any).username,
@@ -180,7 +186,13 @@ router.get('/me', authMiddleware, async (req: any, res: any) => {
   // try DB
   try {
     const db = getMongoClient().db()
-    const user = await db.collection('users').findOne({ _id: (userId as any) })
+    // Allow both string and ObjectId _id schemas
+    let query: any = { _id: userId as any }
+    // If looks like a 24-char hex, try ObjectId as well
+    if (typeof userId === 'string' && /^[a-fA-F0-9]{24}$/.test(userId)) {
+      try { query = { $or: [ { _id: new ObjectId(userId) }, { _id: userId } ] } } catch { /* ignore invalid ObjectId */ }
+    }
+    const user = await db.collection('users').findOne(query)
     if (user) return res.json({ id: user._id, username: (user as any).username, avatarUrl: getAvatarFor((user as any).username) })
   } catch (e) {
     // ignore
@@ -223,7 +235,16 @@ router.post('/unfollow/:userId', authMiddleware, async (req: any, res: any) => {
 // List followers
 router.get('/:id/followers', async (req: any, res: any) => {
   const id = String(req.params.id)
-  const list = mem.followers.filter((f: any) => f.followeeId === id)
+  // Combine DB and memory
+  let list: any[] = mem.followers.filter((f: any) => String(f.followeeId) === id)
+  try {
+    const db = getMongoClient().db()
+    const docs = await db.collection('follows').find({ followeeId: (id as any) }).toArray()
+    list = list.concat(docs.map((d:any) => ({ followerId: String(d.followerId), followeeId: String(d.followeeId), createdAt: d.createdAt || new Date() })))
+  } catch {}
+  // de-duplicate by followerId
+  const seen = new Set<string>()
+  list = list.filter((f:any) => { const k = String(f.followerId); if (seen.has(k)) return false; seen.add(k); return true })
   if (String(req.query.expand) === '1' || String(req.query.expand).toLowerCase() === 'true') {
     const ids = Array.from(new Set(list.map((f:any)=> f.followerId)))
     const profiles: any[] = []
@@ -246,7 +267,14 @@ router.get('/:id/followers', async (req: any, res: any) => {
 // List following
 router.get('/:id/following', async (req: any, res: any) => {
   const id = String(req.params.id)
-  const list = mem.followers.filter((f: any) => f.followerId === id)
+  let list: any[] = mem.followers.filter((f: any) => String(f.followerId) === id)
+  try {
+    const db = getMongoClient().db()
+    const docs = await db.collection('follows').find({ followerId: (id as any) }).toArray()
+    list = list.concat(docs.map((d:any) => ({ followerId: String(d.followerId), followeeId: String(d.followeeId), createdAt: d.createdAt || new Date() })))
+  } catch {}
+  const seen = new Set<string>()
+  list = list.filter((f:any) => { const k = String(f.followeeId); if (seen.has(k)) return false; seen.add(k); return true })
   if (String(req.query.expand) === '1' || String(req.query.expand).toLowerCase() === 'true') {
     const ids = Array.from(new Set(list.map((f:any)=> f.followeeId)))
     const profiles: any[] = []
@@ -283,8 +311,8 @@ router.get('/:id/meta', async (req: any, res: any) => {
   // Memory fallback
   const m = mem.users.find(u => String(u._id) === id)
   if (m) {
-    const followersCount = mem.followers.filter(f => f.followeeId === id).length
-    const followingCount = mem.followers.filter(f => f.followerId === id).length
+    const followersCount = mem.followers.filter(f => String(f.followeeId) === id).length
+    const followingCount = mem.followers.filter(f => String(f.followerId) === id).length
     const postsCount = mem.posts.filter(p => String(p.ownerId) === id).length
     return res.json({ id: m._id, username: m.username, avatarUrl: getAvatarFor(m.username), bio: (m as any).bio || null, followersCount, followingCount, postsCount })
   }

@@ -2,7 +2,7 @@ import ContentCard from '../components/ContentCard'
 
 export default function Trending() {
   const sample = [
-    { id: 't1', title: 'Viral Clip', mediaType: 'video', likes: 500, replies: 30, reposts: 100, views: 20000 }
+    { id: 't1', title: 'Viral Clip', mediaType: 'video', mediaUrl: '/uploads/video/sample.mp4', likes: 500, replies: 30, reposts: 100, views: 20000 }
   ]
   return (
     <div className="p-4">

@@ -3,8 +3,7 @@ import Button from '../components/ui/Button'
 import { useState } from 'react'
 
 function api(path: string, opts: RequestInit = {}) {
-  const base = process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4002'
-  return fetch(`${base}${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, ...opts }).then(r => r.json())
+  return fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, ...opts }).then(r => r.json())
 }
 
 export default function Tools() {

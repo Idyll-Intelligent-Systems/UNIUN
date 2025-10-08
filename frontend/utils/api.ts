@@ -1,4 +1,10 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+// Prefer same-origin calls everywhere. Allow explicit override via envs (useful in local dev SSR).
+const API_BASE = typeof window !== 'undefined'
+  ? ''
+  : (process.env.API_SERVER_URL
+      || process.env.NEXT_PUBLIC_API_BASE
+      || process.env.NEXT_PUBLIC_API_URL
+      || '')
 
 export async function api(path: string, opts: RequestInit = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
@@ -36,6 +42,10 @@ export async function deletePost(postId: string) {
   return api(`/api/posts/${postId}`, { method: 'DELETE' })
 }
 
+export async function viewPost(postId: string) {
+  return api(`/api/posts/${postId}/view`, { method: 'POST' })
+}
+
 // interactions
 export async function likePost(postId: string) {
   return api(`/api/interactions/${postId}/like`, { method: 'POST' })
@@ -50,6 +60,10 @@ export async function bookmarkPost(postId: string) {
 }
 export async function replyPost(postId: string, text: string) {
   return api(`/api/interactions/${postId}/reply`, { method: 'POST', body: JSON.stringify({ text }) })
+}
+
+export async function interactionStatus(postId: string) {
+  return api(`/api/interactions/${postId}/status`)
 }
 
 // cart
@@ -83,5 +97,5 @@ export async function unreadCount() { return api('/api/messages/unread-count') }
 export async function getThread(withUserId: string) { return api(`/api/messages/${withUserId}`) }
 export async function sendMessage(withUserId: string, text: string) { return api(`/api/messages/${withUserId}`, { method: 'POST', body: JSON.stringify({ text }) }) }
 
-const exported = { api, register, login, createPost, listPosts, deletePost, likePost, repostPost, bookmarkPost, replyPost, addToCart, getCart, checkoutCart, listBookmarks, listReposts, listReplies, me, followUser, unfollowUser, listFollowers, listFollowing, listConversations, unreadCount, getThread, sendMessage }
+const exported = { api, register, login, createPost, listPosts, deletePost, viewPost, likePost, repostPost, bookmarkPost, replyPost, interactionStatus, addToCart, getCart, checkoutCart, listBookmarks, listReposts, listReplies, me, followUser, unfollowUser, listFollowers, listFollowing, listConversations, unreadCount, getThread, sendMessage }
 export default exported

@@ -1,4 +1,73 @@
 # UNIUN
+
+This repo contains a Next.js frontend and a Node/Express backend with MongoDB, Neo4j, and optional Milvus, plus Prometheus/Grafana for metrics.
+
+## Local development with Docker Compose
+
+Prerequisites: Docker, Docker Compose.
+
+1) Build and run all services
+
+```bash
+docker compose up --build
+```
+
+Services:
+- frontend: http://localhost:3000
+- backend: http://localhost:4000 (health: /health, metrics: /metrics)
+- mongo: localhost:27017
+- neo4j: http://localhost:7474 (bolt 7687, auth neo4j/neo4jpassword)
+- milvus: 19530 (optional)
+- prometheus: http://localhost:9090
+- grafana: http://localhost:3001 (admin/admin)
+
+Uploads are persisted to `./uploads` on the host and mounted into the backend container.
+
+Environment:
+- Frontend uses `NEXT_PUBLIC_API_URL` (defaults to http://localhost:4000) to talk to backend.
+- Backend uses `PORT=4000`, `MONGO_URI=mongodb://mongo:27017/uniun`, `NEO4J_URI=bolt://neo4j:7687`, `NEO4J_USER=neo4j`, `NEO4J_PASSWORD=neo4jpassword`.
+
+## Build images manually
+
+```bash
+docker build -t un1un1-backend:latest ./backend
+docker build -t un1un1-frontend:latest ./frontend
+```
+
+## Deploy to AWS ECS (Fargate)
+
+See `DeployToECS.md` for quick commands. We also provide:
+
+- Task definition templates: `infra/ecs/taskdef-*.template.json`
+- Service templates: `infra/ecs/service-*.template.json`
+- Helper script: `scripts/deploy-ecs.sh`
+
+Before running the script, export required networking and IAM values (do not commit secrets):
+
+```bash
+export SUBNET_ID_1=subnet-abc123
+export SUBNET_ID_2=subnet-def456
+export SECURITY_GROUP_ID=sg-0123456789abcdef0
+export EXECUTION_ROLE_ARN=arn:aws:iam::123456789012:role/ecsTaskExecutionRole
+export TASK_ROLE_ARN=arn:aws:iam::123456789012:role/ecsTaskRole
+export JWT_SECRET=change-me
+export MONGO_URI=mongodb://your-mongo:27017/uniun
+export NEO4J_URI=bolt://your-neo4j:7687
+export NEO4J_USER=neo4j
+export NEO4J_PASSWORD=strong-password
+export NEXT_PUBLIC_API_URL=https://your-backend.example.com
+```
+
+Then:
+
+```bash
+bash scripts/deploy-ecs.sh
+```
+
+Security notes:
+- Never commit real cloud credentials. Use AWS SSO, profiles, or env vars in your shell.
+- Rotate and revoke any accidentally exposed keys in IAM immediately.
+
 Easy Content Monetization App for Creators, SAAS
  
 # Application Requirements:

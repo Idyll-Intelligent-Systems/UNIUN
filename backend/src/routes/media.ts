@@ -7,10 +7,14 @@ import path from 'path'
 
 const router = Router()
 
-const rootUploadDir = path.resolve(__dirname, '..', '..', 'uploads')
-const upload = multer({ dest: path.join(rootUploadDir, '.tmp') })
-
+const rootUploadDir = path.resolve(__dirname, '..', 'uploads')
+const tmpDir = path.join(rootUploadDir, '.tmp')
 function ensureDir(p: string) { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }) }
+ensureDir(rootUploadDir)
+ensureDir(tmpDir)
+const upload = multer({ dest: tmpDir })
+
+function ensureDirIfMissing(p: string) { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }) }
 
 function pickCategory(mime: string, fallback: string = 'images') {
   if (!mime) return fallback
@@ -50,8 +54,8 @@ router.post('/upload', authMiddleware, upload.single('file'), async (req: any, r
   try {
     if (!req.file) return res.status(400).json({ error: 'file required' })
     const cat = pickCategory(req.file.mimetype)
-    const dir = path.join(rootUploadDir, cat)
-    ensureDir(dir)
+  const dir = path.join(rootUploadDir, cat)
+  ensureDirIfMissing(dir)
     const ext = path.extname(req.file.originalname || '') || ''
     const name = `${Date.now()}-${crypto.randomBytes(5).toString('hex')}${ext}`
     const target = path.join(dir, name)

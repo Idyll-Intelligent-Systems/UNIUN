@@ -13,7 +13,8 @@
     "skipLibCheck": true,
     "types": [
       "jest",
-      "@testing-library/jest-dom"
+      "@testing-library/jest-dom",
+      "node"
     ],
     "allowJs": true,
     "noEmit": true,

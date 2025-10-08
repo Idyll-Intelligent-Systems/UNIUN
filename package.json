@@ -7,7 +7,9 @@
     "dev:frontend": "bash -lc 'cd frontend && NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:4002} npx next dev -p ${FRONTEND_PORT:-3002}'",
     "dev:bg": "bash scripts/dev-bg.sh",
     "dev:down": "bash scripts/dev-down.sh",
-    "dev:status": "bash scripts/dev-status.sh"
+    "dev:status": "bash scripts/dev-status.sh",
+    "profile:local": "bash scripts/profile-local.sh",
+    "profile:prd": "bash scripts/profile-prd.sh"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

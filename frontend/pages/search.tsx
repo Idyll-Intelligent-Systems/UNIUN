@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Card } from '../components/ui/Card'
+import EmojiPicker from '../components/ui/EmojiPicker'
+import Button from '../components/ui/Button'
 import api from '../utils/api'
 import Image from 'next/image'
 import { useToast } from '../components/ui/Toast'
+import { normalizeMediaUrl } from '../utils/media'
 
 export default function SearchPage() {
   const { show } = useToast()
@@ -17,6 +20,7 @@ export default function SearchPage() {
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const [limit, setLimit] = useState(12)
+  const [showEmojis, setShowEmojis] = useState(false)
 
   async function run() {
     try {
@@ -81,31 +85,33 @@ export default function SearchPage() {
   }
 
   return (
-    <Card className="p-4">
-      <h2 className="text-xl font-semibold mb-3">Search</h2>
-      <div className="flex gap-2 mb-4">
-        <input value={q} onChange={e=>setQ(e.target.value)} className="flex-1 p-2 bg-gray-800 rounded" placeholder="Search users and posts" />
-        <button onClick={run} className="px-3 py-2 bg-gold rounded">Go</button>
+    <Card className="p-4 glass shadow-premium border border-white/10">
+      <h2 className="heading-premium text-2xl mb-4">Search</h2>
+      <div className="flex gap-2 mb-4 relative">
+        <input value={q} onChange={e=>setQ(e.target.value)} className="flex-1 p-3 pr-12 bg-white/10 text-premium rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-[#3b82f6] transition-premium" placeholder="Search users and posts" />
+        <Button className="absolute right-28 top-1/2 -translate-y-1/2 px-2 py-1" onClick={() => setShowEmojis(s => !s)}>😊</Button>
+        {showEmojis && <EmojiPicker onSelect={(e)=>{ setQ(t=>t+e); setShowEmojis(false) }} onClose={()=>setShowEmojis(false)} anchorClass="right-28" />}
+        <button onClick={run} className="px-4 py-2 glass shadow-premium rounded-lg border border-white/10">Go</button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <h3 className="font-semibold mb-2">Users</h3>
+          <h3 className="heading-premium text-lg mb-3">Users</h3>
           {q.trim().length === 0 ? (
             <>
               <div className="flex items-center gap-2 mb-3">
                 <label className="text-sm text-gray-400">Sort by</label>
-                <select aria-label="Sort by" className="bg-gray-800 rounded p-1 text-sm" value={sort} onChange={e => loadDirectory(1, e.target.value as any, dir, limit)}>
+                <select aria-label="Sort by" className="bg-white/10 text-premium rounded p-2 text-sm border border-white/20" value={sort} onChange={e => loadDirectory(1, e.target.value as any, dir, limit)}>
                   <option value="followers">Followers</option>
                   <option value="following">Following</option>
                   <option value="posts">Posts</option>
                   <option value="username">Username</option>
                 </select>
-                <select aria-label="Sort direction" className="bg-gray-800 rounded p-1 text-sm" value={dir} onChange={e => loadDirectory(1, sort, e.target.value as any, limit)}>
+                <select aria-label="Sort direction" className="bg-white/10 text-premium rounded p-2 text-sm border border-white/20" value={dir} onChange={e => loadDirectory(1, sort, e.target.value as any, limit)}>
                   <option value="desc">Desc</option>
                   <option value="asc">Asc</option>
                 </select>
                 <label className="text-sm text-gray-400 ml-2">Page size</label>
-                <select aria-label="Page size" className="bg-gray-800 rounded p-1 text-sm" value={limit} onChange={e => loadDirectory(1, sort, dir, parseInt(e.target.value,10))}>
+                <select aria-label="Page size" className="bg-white/10 text-premium rounded p-2 text-sm border border-white/20" value={limit} onChange={e => loadDirectory(1, sort, dir, parseInt(e.target.value,10))}>
                   <option value={8}>8</option>
                   <option value={12}>12</option>
                   <option value={24}>24</option>
@@ -114,13 +120,13 @@ export default function SearchPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {allUsers.length === 0 && <div className="text-gray-500">No users available</div>}
               {allUsers.map((u:any, i:number) => (
-                <div key={u.id || i} className="p-3 rounded bg-black/30 border border-gray-800">
+                <div key={u.id || i} className="p-3 rounded-lg bg-black/20 border border-white/10 glass">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       {u.avatarUrl && <Image src={u.avatarUrl} alt={u.username} width={24} height={24} className="rounded-full" />}
                       <div className="font-medium text-gray-200">{u.username}</div>
                     </div>
-                    <button onClick={()=>toggleFollow(u.id || u._id || u.username)} className="px-2 py-1 text-sm bg-gold rounded text-black">
+                    <button onClick={()=>toggleFollow(u.id || u._id || u.username)} className="px-2 py-1 text-sm glass shadow-premium rounded border border-white/10">
                       {following.includes(u.id || u._id || u.username) ? 'Unfollow' : 'Follow'}
                     </button>
                   </div>
@@ -139,9 +145,9 @@ export default function SearchPage() {
             <div className="flex items-center justify-between mt-3">
               <div className="text-xs text-gray-500">Total: {total}</div>
               <div className="flex items-center gap-2">
-                <button disabled={page<=1} onClick={()=>loadDirectory(page-1)} className="px-2 py-1 bg-gray-800 rounded disabled:opacity-50">Prev</button>
+                <button disabled={page<=1} onClick={()=>loadDirectory(page-1)} className="px-2 py-1 glass rounded border border-white/10 disabled:opacity-50">Prev</button>
                 <span className="text-xs text-gray-400">Page {page}</span>
-                <button disabled={page*limit>=total} onClick={()=>loadDirectory(page+1)} className="px-2 py-1 bg-gray-800 rounded disabled:opacity-50">Next</button>
+                <button disabled={page*limit>=total} onClick={()=>loadDirectory(page+1)} className="px-2 py-1 glass rounded border border-white/10 disabled:opacity-50">Next</button>
               </div>
             </div>
             </>
@@ -154,7 +160,7 @@ export default function SearchPage() {
                   {users.map((u:any, i:number)=> (
                     <li key={i} className="flex items-center justify-between">
                       <div className="text-gray-200">{u.username}</div>
-                      <button onClick={()=>toggleFollow(u._id || u.id || u.username)} className="px-3 py-1 bg-gold rounded text-black">
+                      <button onClick={()=>toggleFollow(u._id || u.id || u.username)} className="px-3 py-1 glass rounded border border-white/10">
                         {following.includes(u._id || u.id || u.username) ? 'Unfollow' : 'Follow'}
                       </button>
                     </li>
@@ -165,11 +171,34 @@ export default function SearchPage() {
           )}
         </div>
         <div>
-          <h3 className="font-semibold mb-2">Posts</h3>
+          <h3 className="heading-premium text-lg mb-3">Posts</h3>
           {posts.length===0 && <div className="text-gray-500">No posts</div>}
-          <ul className="space-y-1">
-            {posts.map((p:any, i:number)=> <li key={i} className="text-gray-200">{p.title}</li>)}
-          </ul>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 gap-3">
+            {posts.filter((p:any)=> !!p.mediaUrl).map((p:any, i:number)=> {
+              const media = normalizeMediaUrl(p.mediaUrl)
+              return (
+                <a key={i} href={`/posts/${encodeURIComponent(p._id || p.id || i)}`} className="block group">
+                  <div className="relative w-full rounded-lg overflow-hidden border border-white/10 bg-black/20" style={{ aspectRatio: '1 / 1' }}>
+                    {media ? (
+                      p.mediaType === 'video' ? (
+                        <video className="absolute inset-0 w-full h-full object-cover" muted playsInline>
+                          <source src={media} />
+                        </video>
+                      ) : (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={media} alt={p.title || 'media'} className="absolute inset-0 w-full h-full object-cover" />
+                      )
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-xs text-gray-500">No media</div>
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 p-1.5 text-[11px] bg-black/35 backdrop-blur-sm truncate opacity-0 group-hover:opacity-100 transition-premium">
+                      {p.title}
+                    </div>
+                  </div>
+                </a>
+              )
+            })}
+          </div>
         </div>
       </div>
     </Card>

@@ -1,0 +1,22 @@
+{
+  "cluster": "${CLUSTER_ARN}",
+  "serviceName": "un1un1Service-frontend",
+  "taskDefinition": "${TASKDEF_ARN}",
+  "desiredCount": 1,
+  "launchType": "FARGATE",
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "assignPublicIp": "ENABLED",
+      "subnets": ["${SUBNET_ID_1}", "${SUBNET_ID_2}"],
+      "securityGroups": ["${SECURITY_GROUP_ID}"]
+    }
+  },
+  "loadBalancers": [
+    {
+      "targetGroupArn": "${TARGET_GROUP_ARN}",
+      "containerName": "frontend",
+      "containerPort": 3000
+    }
+  ],
+  "healthCheckGracePeriodSeconds": 60
+}

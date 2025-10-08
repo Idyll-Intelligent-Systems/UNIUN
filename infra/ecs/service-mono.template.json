@@ -1,0 +1,26 @@
+{
+  "cluster": "${CLUSTER_ARN}",
+  "serviceName": "un1un1Service",
+  "taskDefinition": "${TASKDEF_ARN}",
+  "desiredCount": 1,
+  "launchType": "FARGATE",
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": ["${SUBNET_ID_1}", "${SUBNET_ID_2}"],
+      "securityGroups": ["${SECURITY_GROUP_ID}"],
+      "assignPublicIp": "ENABLED"
+    }
+  },
+  "loadBalancers": [
+    {
+      "targetGroupArn": "${TARGET_GROUP_ARN}",
+      "containerName": "frontend",
+      "containerPort": 3000
+    },
+    {
+      "targetGroupArn": "${BACKEND_TARGET_GROUP_ARN}",
+      "containerName": "backend",
+      "containerPort": 4000
+    }
+  ]
+}

@@ -17,7 +17,7 @@ router.post('/register', async (req, res) => {
   const existing = await db.collection('users').findOne({ username })
   if (existing) return res.status(409).json({ error: 'username exists' })
   const hash = await bcrypt.hash(password, 10)
-  const user = { _id: newId(), username, password: hash, createdAt: new Date() }
+  const user = { _id: newId(), username, password: hash, createdAt: new Date(), avatarUrl: '/avatars/veee.png' }
   const result = await db.collection('users').insertOne(user)
   saveDevData()
   // For memory shim, insertedId may not exist; return user._id instead

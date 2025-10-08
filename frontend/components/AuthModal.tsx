@@ -15,10 +15,17 @@ export default function AuthModal({ onClose }: { onClose?: () => void }) {
       if (isLogin) {
         const res: any = await login(username, password)
         localStorage.setItem('token', res.token)
+        // Notify listeners that auth state changed
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('auth:changed'))
+        }
         // After basic auth login, go to profile
         router.push('/profile')
       } else {
         await register(username, password)
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('auth:changed'))
+        }
         // After registration, switch to login for clarity
         setIsLogin(true)
       }
@@ -29,13 +36,13 @@ export default function AuthModal({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/60">
-      <Card className="p-6 w-96">
-        <h3 className="text-lg font-semibold mb-4">{isLogin ? 'Login' : 'Register'}</h3>
-        <input className="w-full mb-2 p-2 rounded bg-gray-900" placeholder="username" value={username} onChange={(e) => setUsername(e.target.value)} />
-        <input className="w-full mb-4 p-2 rounded bg-gray-900" placeholder="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+    <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-md">
+      <Card className="glass shadow-premium transition-premium p-8 w-96 border border-white/10">
+        <h3 className="heading-premium text-2xl mb-6 text-center">{isLogin ? 'Login' : 'Register'}</h3>
+        <input className="w-full mb-3 p-3 rounded-lg bg-white/10 text-premium border border-white/20 focus:outline-none focus:ring-2 focus:ring-[#3b82f6] transition-premium" placeholder="username" value={username} onChange={(e) => setUsername(e.target.value)} />
+        <input className="w-full mb-5 p-3 rounded-lg bg-white/10 text-premium border border-white/20 focus:outline-none focus:ring-2 focus:ring-[#3b82f6] transition-premium" placeholder="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         <div className="flex gap-2 justify-end">
-          <Button onClick={() => setIsLogin(!isLogin)} variant="ghost">{isLogin ? 'Switch to Register' : 'Switch to Login'}</Button>
+          <Button onClick={() => setIsLogin(!isLogin)}>{isLogin ? 'Switch to Register' : 'Switch to Login'}</Button>
           <Button onClick={submit}>{isLogin ? 'Login' : 'Register'}</Button>
         </div>
       </Card>

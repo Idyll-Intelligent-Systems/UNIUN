@@ -1,5 +1,6 @@
 import { Card } from '../components/ui/Card'
 import { useEffect, useRef, useState } from 'react'
+import { buildWsUrl } from '../utils/ws'
 
 export default function Uniun() {
   const [msgs, setMsgs] = useState<string[]>([])
@@ -15,12 +16,11 @@ export default function Uniun() {
   const [turnConfig, setTurnConfig] = useState<any>(null)
 
   useEffect(() => {
-    const base = process.env.NEXT_PUBLIC_WS_BASE || 'http://localhost:4000'
-    const url = (base.replace(/^http/, 'ws')) + '/ws'
+  const url = buildWsUrl('/ws')
     // fetch turn/stun config from backend if available
     ;(async () => {
       try {
-        const res = await fetch(`${base}/api/turn`)
+        const res = await fetch('/api/turn')
         if (res.ok) setTurnConfig(await res.json())
       } catch (e) {
         // ignore

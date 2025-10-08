@@ -17,6 +17,7 @@ import usersRoutes from './routes/users'
 import messagesRoutes from './routes/messages'
 import 'express-async-errors'
 import path from 'path'
+import os from 'os'
 
 const app = express();
 app.set('trust proxy', 1)
@@ -26,6 +27,13 @@ app.use(helmet({
 }))
 app.use(rateLimit({ windowMs: 60 * 1000, max: 600 }))
 app.use(express.json());
+// Lightweight request logger for debugging in ECS
+app.use((req, _res, next) => {
+  if (req.path.startsWith('/api/')) {
+    console.log(`[req] ${req.method} ${req.path}`)
+  }
+  next()
+})
 // Serve uploads from both possible locations (dist/../uploads and dist/../../uploads) to cover
 // dev and docker layouts; first existing path will serve.
 app.use('/uploads', express.static(path.resolve(__dirname, '..', 'uploads')))
@@ -36,6 +44,10 @@ setupMetrics();
 
 app.get('/health', async (req, res) => {
   res.json({ status: 'ok' });
+});
+// Alias under /api for ALB path routing convenience
+app.get('/api/health', async (req, res) => {
+  res.json({ status: 'ok' })
 });
 
 app.get('/metrics', async (req, res) => {
@@ -60,7 +72,13 @@ if (process.env.NODE_ENV !== 'production') {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: any, req: any, res: any, next: any) => {
-  console.error(err)
+  try {
+    console.error(`[error] ${req?.method || ''} ${req?.path || ''}`)
+    if (err?.stack) console.error(err.stack)
+    else console.error(err)
+  } catch (e) {
+    console.error(err)
+  }
   res.status(500).json({ error: 'internal' })
 })
 

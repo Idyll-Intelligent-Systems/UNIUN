@@ -31,15 +31,19 @@ router.post('/seed', (req, res) => {
       mem.users.push({ _id: newId(), username: b.username, password: '$2a$10$8e3H1vK0b8l6m6m6m6m6.u0vJxXo1KjvKqGm1dQw9G7nKQy2p2Q2', createdAt: now } as any)
     }
   }
+  // Sample local assets under /uploads (mounted into backend container). If some paths don't exist, frontend will still show placeholders.
+  const img1 = '/uploads/images/1759689109102-06efaa04ce.jpeg'
+  const img2 = '/uploads/images/1759845725777-1803cd2686.jpeg'
+  const vid1 = '/uploads/video/1759847815464-483f0d6e2c.MP4'
   const posts = [
-    { _id: newId(), title: 'Welcome to UNIUN', mediaType: 'image', ownerId, likes: 3, replies: 0, reposts: 1, views: 10, createdAt: now },
-    { _id: newId(), title: 'Second post', mediaType: 'video', ownerId, likes: 1, replies: 0, reposts: 0, views: 5, createdAt: now },
-    { _id: newId(), title: 'PAZE: “Budgeted my energy; budget was zero.”', mediaType: 'image', ownerId: mem.users.find(u=>u.username==='PAZE')?._id || ownerId, likes: 2, replies: 0, reposts: 0, views: 12, createdAt: now },
-    { _id: newId(), title: 'Veee: “Vroom vroom into prod.”', mediaType: 'image', ownerId: mem.users.find(u=>u.username==='Veee')?._id || ownerId, likes: 1, replies: 0, reposts: 0, views: 8, createdAt: now },
-    { _id: newId(), title: 'MSSM: “Minimal bugs, maximal shipping.”', mediaType: 'image', ownerId: mem.users.find(u=>u.username==='MSSM')?._id || ownerId, likes: 4, replies: 0, reposts: 1, views: 15, createdAt: now },
-    { _id: newId(), title: 'PrDeep: “Edge case discovered: reality.”', mediaType: 'image', ownerId: mem.users.find(u=>u.username==='PrDeep')?._id || ownerId, likes: 5, replies: 1, reposts: 1, views: 20, createdAt: now },
-    { _id: newId(), title: 'SHAVAITE: “Coffee.compile() success.”', mediaType: 'image', ownerId: mem.users.find(u=>u.username==='SHAVAITE')?._id || ownerId, likes: 3, replies: 1, reposts: 0, views: 14, createdAt: now },
-    { _id: newId(), title: 'MITRA: “Mentored a bot today.”', mediaType: 'image', ownerId: mem.users.find(u=>u.username==='MITRA')?._id || ownerId, likes: 2, replies: 0, reposts: 0, views: 9, createdAt: now },
+    { _id: newId(), title: 'Welcome to UNIUN', mediaType: 'image', mediaUrl: img1, ownerId, likes: 3, replies: 0, reposts: 1, views: 10, createdAt: now },
+    { _id: newId(), title: 'Second post (video demo)', mediaType: 'video', mediaUrl: vid1, ownerId, likes: 1, replies: 0, reposts: 0, views: 5, createdAt: now },
+    { _id: newId(), title: 'PAZE: “Budgeted my energy; budget was zero.”', mediaType: 'image', mediaUrl: img2, ownerId: mem.users.find(u=>u.username==='PAZE')?._id || ownerId, likes: 2, replies: 0, reposts: 0, views: 12, createdAt: now },
+    { _id: newId(), title: 'Veee: “Vroom vroom into prod.”', mediaType: 'image', mediaUrl: img1, ownerId: mem.users.find(u=>u.username==='Veee')?._id || ownerId, likes: 1, replies: 0, reposts: 0, views: 8, createdAt: now },
+    { _id: newId(), title: 'MSSM: “Minimal bugs, maximal shipping.”', mediaType: 'image', mediaUrl: img2, ownerId: mem.users.find(u=>u.username==='MSSM')?._id || ownerId, likes: 4, replies: 0, reposts: 1, views: 15, createdAt: now },
+    { _id: newId(), title: 'PrDeep: “Edge case discovered: reality.”', mediaType: 'image', mediaUrl: img1, ownerId: mem.users.find(u=>u.username==='PrDeep')?._id || ownerId, likes: 5, replies: 1, reposts: 1, views: 20, createdAt: now },
+    { _id: newId(), title: 'SHAVAITE: “Coffee.compile() success.”', mediaType: 'image', mediaUrl: img2, ownerId: mem.users.find(u=>u.username==='SHAVAITE')?._id || ownerId, likes: 3, replies: 1, reposts: 0, views: 14, createdAt: now },
+    { _id: newId(), title: 'MITRA: “Mentored a bot today.”', mediaType: 'image', mediaUrl: img1, ownerId: mem.users.find(u=>u.username==='MITRA')?._id || ownerId, likes: 2, replies: 0, reposts: 0, views: 9, createdAt: now },
   ]
   mem.posts.unshift(...posts)
   // Optionally create some follower edges among bots so messages list has data after follow

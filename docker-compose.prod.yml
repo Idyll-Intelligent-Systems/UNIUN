@@ -1,0 +1,38 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        API_SERVER_URL: ${API_SERVER_URL}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - API_SERVER_URL=${API_SERVER_URL}
+      - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${MONGO_URI}
+      - NEO4J_URI=${NEO4J_URI}
+      - NEO4J_USER=${NEO4J_USER}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      # Optional Vector DB config
+      - VECTORDB_KIND=${VECTORDB_KIND:-}
+      - MILVUS_URI=${MILVUS_URI:-}
+      - QDRANT_URL=${QDRANT_URL:-}
+      - PINECONE_API_KEY=${PINECONE_API_KEY:-}
+      - PINECONE_INDEX=${PINECONE_INDEX:-}
+    volumes:
+      - ./uploads:/app/uploads
+

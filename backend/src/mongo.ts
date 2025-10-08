@@ -1,13 +1,20 @@
 import { MongoClient } from 'mongodb';
 import { mem } from './memory'
 
-const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/uniun';
+const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/uniun';
 let client: MongoClient | null = null;
 let connected = false;
 
 export async function connectMongo() {
   const timeout = Number(process.env.MONGO_TIMEOUT_MS || 2000)
-  const c = new MongoClient(uri, { serverSelectionTimeoutMS: timeout });
+  const tls = process.env.MONGO_TLS === 'true'
+  const caFile = process.env.MONGO_CA_FILE
+  const c = new MongoClient(uri, {
+    serverSelectionTimeoutMS: timeout,
+    tls,
+    tlsCAFile: caFile,
+    // For SRV connection strings, these will be ignored if not applicable
+  } as any);
   try {
     await c.connect();
     client = c;
@@ -16,7 +23,7 @@ export async function connectMongo() {
   } catch (err) {
     // Ensure we fall back to memory shim
     connected = false;
-    try { await c.close(); } catch {}
+  try { await c.close(); } catch (e) { /* ignore close errors */ }
     client = null;
     throw err;
   }
@@ -41,7 +48,7 @@ export function getMongoClient() {
                 if (name === 'posts') { mem.posts.unshift(doc); return { insertedId: doc._id } }
                 return { insertedId: null }
               },
-              async updateOne(filter: any, update: any, opts?: any) {
+              async updateOne(filter: any, update: any) {
                 if (name === 'posts' && update?.$inc?.likes) {
                   const p = mem.posts.find(p => p._id === filter._id?.toString?.() || p._id === filter._id)
                   if (p) p.likes += update.$inc.likes

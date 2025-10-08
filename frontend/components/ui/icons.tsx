@@ -1,5 +1,5 @@
 import React from 'react'
-import { Heart, MessageCircle, Repeat, Eye, Search, Upload, Home, ShoppingCart, PlusCircle, MessageSquare, User, Trash2 } from 'lucide-react'
+import { Heart, MessageCircle, Repeat, Eye, Search, Upload, Home, ShoppingCart, PlusCircle, MessageSquare, User, Trash2, Pencil, Video } from 'lucide-react'
 
 export const Icons = {
   Heart: (props: any) => <Heart className="inline-block" {...props} />,
@@ -14,7 +14,10 @@ export const Icons = {
   PlusCircle: (props: any) => <PlusCircle className="inline-block" {...props} />,
   MessageSquare: (props: any) => <MessageSquare className="inline-block" {...props} />,
   User: (props: any) => <User className="inline-block" {...props} />,
-  Trash: (props: any) => <Trash2 className="inline-block" {...props} />
+  Trash: (props: any) => <Trash2 className="inline-block" {...props} />,
+  Edit: (props: any) => <Pencil className="inline-block" {...props} />
+  ,
+  Video: (props: any) => <Video className="inline-block" {...props} />
 }
 
 export default Icons

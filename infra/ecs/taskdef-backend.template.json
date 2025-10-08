@@ -1,0 +1,55 @@
+{
+  "family": "un1un1TaskDefinition-backend",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "${EXECUTION_ROLE_ARN}",
+  "taskRoleArn": "${TASK_ROLE_ARN}",
+  "containerDefinitions": [
+    {
+      "name": "backend",
+      "image": "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/un1un1:${BACKEND_TAG}",
+      "essential": true,
+      "portMappings": [
+        { "containerPort": 4000, "protocol": "tcp" }
+      ],
+      "environment": [
+        { "name": "PORT", "value": "4000" },
+        { "name": "JWT_SECRET", "value": "${JWT_SECRET}" },
+        { "name": "MONGO_URI", "value": "${MONGO_URI}" },
+        { "name": "MONGO_TIMEOUT_MS", "value": "${MONGO_TIMEOUT_MS}" },
+        { "name": "NEO4J_URI", "value": "${NEO4J_URI}" },
+        { "name": "NEO4J_USER", "value": "${NEO4J_USER}" },
+        { "name": "NEO4J_PASSWORD", "value": "${NEO4J_PASSWORD}" },
+        { "name": "NEO4J_ENCRYPTED", "value": "${NEO4J_ENCRYPTED}" },
+  { "name": "OPENSEARCH_HOST", "value": "${OPENSEARCH_HOST}" },
+  { "name": "OPENSEARCH_USERNAME", "value": "${OPENSEARCH_USERNAME}" },
+  { "name": "OPENSEARCH_PASSWORD", "value": "${OPENSEARCH_PASSWORD}" },
+  { "name": "OPENSEARCH_INDEX", "value": "${OPENSEARCH_INDEX}" },
+  { "name": "VECTORDB_KIND", "value": "${VECTORDB_KIND}" },
+  { "name": "QDRANT_URL", "value": "${QDRANT_URL}" },
+  { "name": "PINECONE_API_KEY", "value": "${PINECONE_API_KEY}" },
+  { "name": "PINECONE_INDEX", "value": "${PINECONE_INDEX}" },
+  { "name": "MILVUS_URI", "value": "${MILVUS_URI}" },
+        { "name": "GOOGLE_CLIENT_ID", "value": "${GOOGLE_CLIENT_ID}" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/un1un1/backend",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:4000/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 30
+      }
+    }
+  ],
+  "ephemeralStorage": { "sizeInGiB": 21 }
+}

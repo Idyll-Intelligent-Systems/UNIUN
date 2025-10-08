@@ -1,9 +1,14 @@
-export function Card({ children, className = '' }: any) {
-  return (
-    <div className={`rounded-xl overflow-hidden border border-gray-800 bg-gradient-to-b from-[#07070a] to-[#0b0b0f] ${className}`}>
-      {children}
-    </div>
-  )
-}
+import React from 'react'
+
+export const Card = React.forwardRef<HTMLDivElement, { children: React.ReactNode, className?: string }>(
+  ({ children, className = '' }, ref) => {
+    return (
+      <div ref={ref} className={`glass shadow-premium transition-premium rounded-xl overflow-hidden border border-white/10 ${className}`}>
+        {children}
+      </div>
+    )
+  }
+)
+Card.displayName = 'Card'
 
 export default Card
